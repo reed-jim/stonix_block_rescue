@@ -37,8 +37,8 @@ public class ScrewPuzzleInputManager : MonoBehaviour
 
                     if (_selectedScrewPort != null)
                     {
-                        _selectedScrewPort.PutScrew(_selectedScrew);
                         _selectedScrew.BreakJoint();
+                        _selectedScrewPort.PutScrew(_selectedScrew);
 
                         _selectedScrew = null;
                         _selectedScrewPort = null;

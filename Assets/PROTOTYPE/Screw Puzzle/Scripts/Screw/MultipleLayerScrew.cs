@@ -1,12 +1,13 @@
+using System.Collections.Generic;
 using Saferio.Util.SaferioTween;
 using UnityEngine;
 
-public class BasicScrew : MonoBehaviour, IScrew
+public class MultipleLayerScrew : MonoBehaviour, IScrew
 {
     [SerializeField] private Rigidbody2D screwRigidBody;
 
     [Header("JOINT")]
-    [SerializeField] private HingeJoint2D joint;
+    [SerializeField] private HingeJoint2D[] joints;
 
     [Header("CUSTOMIZE")]
     [SerializeField] private Vector2 offsetOnSelected;
@@ -15,10 +16,12 @@ public class BasicScrew : MonoBehaviour, IScrew
     private Vector3 _initialScale;
 
     public Transform Transform { get => transform; }
-    public HingeJoint2D[] Joints { get => new HingeJoint2D[] { joint }; set => joint = value[0]; }
+    public HingeJoint2D[] Joints { get => joints; set => joints = value; }
 
     private void Awake()
     {
+        joints = GetComponents<HingeJoint2D>();
+
         _initialScale = transform.localScale;
     }
 
@@ -30,18 +33,14 @@ public class BasicScrew : MonoBehaviour, IScrew
 
     public void BreakJoint()
     {
-        joint.enabled = false;
+        foreach (var joint in joints)
+        {
+            joint.enabled = false;
+        }
     }
 
     public void Move(Vector3 position)
     {
-        // Vector2 direction = position - transform.position;
-        // Vector2 force = moveForceMultiplier * direction;
-        // screwRigidBody.bodyType = RigidbodyType2D.Dynamic;
-        // Debug.Log(force);
 
-        // screwRigidBody.AddForce(force);
-
-        // transform.position = Vector2.Lerp(transform.position, position, moveForceMultiplier);
     }
 }
