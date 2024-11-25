@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BasicScrew : MonoBehaviour, IScrew
 {
-    [SerializeField] private Rigidbody2D screwRigidBody;
+    [SerializeField] private Transform screwSprite;
 
     [Header("JOINT")]
     [SerializeField] private HingeJoint2D joint;
@@ -24,13 +24,15 @@ public class BasicScrew : MonoBehaviour, IScrew
 
     public void Select()
     {
-        SaferioTween.PositionAsync(transform, transform.position + (Vector3)offsetOnSelected, duration: durationAnimationOnSelected);
+        SaferioTween.LocalPositionAsync(screwSprite, offsetOnSelected, duration: durationAnimationOnSelected);
         // SaferioTween.ScaleAsync(transform, 1.2f * _initialScale, duration: durationAnimationOnSelected);
     }
 
     public void BreakJoint()
     {
         joint.enabled = false;
+
+        SaferioTween.LocalPositionAsync(screwSprite, Vector3.zero, duration: durationAnimationOnSelected);
     }
 
     public void Move(Vector3 position)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MultipleLayerScrew : MonoBehaviour, IScrew
 {
-    [SerializeField] private Rigidbody2D screwRigidBody;
+    [SerializeField] private Transform screwSprite;
 
     [Header("JOINT")]
     [SerializeField] private HingeJoint2D[] joints;
@@ -27,7 +27,7 @@ public class MultipleLayerScrew : MonoBehaviour, IScrew
 
     public void Select()
     {
-        SaferioTween.PositionAsync(transform, transform.position + (Vector3)offsetOnSelected, duration: durationAnimationOnSelected);
+        SaferioTween.LocalPositionAsync(screwSprite, offsetOnSelected, duration: durationAnimationOnSelected);
         // SaferioTween.ScaleAsync(transform, 1.2f * _initialScale, duration: durationAnimationOnSelected);
     }
 
@@ -37,6 +37,8 @@ public class MultipleLayerScrew : MonoBehaviour, IScrew
         {
             joint.enabled = false;
         }
+
+        SaferioTween.LocalPositionAsync(screwSprite, Vector3.zero, duration: durationAnimationOnSelected);
     }
 
     public void Move(Vector3 position)

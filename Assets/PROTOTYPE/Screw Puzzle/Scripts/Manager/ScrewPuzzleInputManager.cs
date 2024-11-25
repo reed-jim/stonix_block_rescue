@@ -23,6 +23,8 @@ public class ScrewPuzzleInputManager : MonoBehaviour
                     if (_selectedScrew != null)
                     {
                         _selectedScrew.Select();
+
+                        PlaySoundSelectScrew();
                     }
 
                     Debug.Log(hit.collider);
@@ -40,6 +42,8 @@ public class ScrewPuzzleInputManager : MonoBehaviour
                         _selectedScrew.BreakJoint();
                         _selectedScrewPort.PutScrew(_selectedScrew);
 
+                        PlaySoundPutScrew();
+
                         _selectedScrew = null;
                         _selectedScrewPort = null;
                     }
@@ -52,5 +56,23 @@ public class ScrewPuzzleInputManager : MonoBehaviour
         // {
         //     _selectedScrew = null;
         // }
+    }
+
+    private void PlaySoundSelectScrew()
+    {
+        AudioSource selectSound = ObjectPoolingEverything.GetFromPool("SelectScrew").GetComponent<AudioSource>();
+
+        selectSound.gameObject.SetActive(true);
+
+        selectSound.Play();
+    }
+
+    private void PlaySoundPutScrew()
+    {
+        AudioSource selectSound = ObjectPoolingEverything.GetFromPool("PutScrew").GetComponent<AudioSource>();
+
+        selectSound.gameObject.SetActive(true);
+
+        selectSound.Play();
     }
 }

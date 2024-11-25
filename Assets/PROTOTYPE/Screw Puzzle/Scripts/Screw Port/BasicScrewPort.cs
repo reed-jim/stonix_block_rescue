@@ -14,7 +14,10 @@ public class BasicScrewPort : MonoBehaviour, IScrewPort
             joint.enabled = true;
         }
 
-        SaferioTween.PositionAsync(screw.Transform, transform.position, duration: 0.4f, onCompletedAction: (() =>
+        Vector3 destination = transform.position;
+        destination.z = screw.Transform.position.z;
+
+        SaferioTween.PositionAsync(screw.Transform, destination, duration: 0.4f, onCompletedAction: (() =>
         {
 
         }));
