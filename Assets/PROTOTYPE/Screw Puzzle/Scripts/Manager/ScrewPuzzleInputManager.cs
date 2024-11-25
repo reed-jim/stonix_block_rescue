@@ -27,8 +27,8 @@ public class ScrewPuzzleInputManager : MonoBehaviour
                         PlaySoundSelectScrew();
                     }
 
-                    Debug.Log(hit.collider);
-                    Debug.Log(_selectedScrew);
+                    // Debug.Log(hit.collider);
+                    // Debug.Log(_selectedScrew);
                 }
             }
             else
