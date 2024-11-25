@@ -50,7 +50,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   screwRigidBody: {fileID: 4370913653275380411}
   joint: {fileID: 8436318190418098489}
-  moveForceMultiplier: 0.01
+  offsetOnSelected: {x: 0, y: 1}
+  durationAnimationOnSelected: 0.3
 --- !u!212 &7294795005463920984
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -94,7 +95,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f73f68fe6815f5548a6c2a61b9e49add, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -163,7 +164,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -185,7 +186,7 @@ HingeJoint2D:
   m_BreakAction: 2
   m_AutoConfigureConnectedAnchor: 1
   m_Anchor: {x: 0, y: 0}
-  m_ConnectedAnchor: {x: 1.39, y: 0}
+  m_ConnectedAnchor: {x: 3, y: 0}
   m_UseConnectedAnchor: 1
   m_UseMotor: 0
   m_Motor:

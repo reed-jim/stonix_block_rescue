@@ -1,3 +1,4 @@
+using Saferio.Util.SaferioTween;
 using UnityEngine;
 
 public class BasicScrew : MonoBehaviour, IScrew
@@ -8,7 +9,15 @@ public class BasicScrew : MonoBehaviour, IScrew
     [SerializeField] private HingeJoint2D joint;
 
     [Header("CUSTOMIZE")]
-    [SerializeField] private float moveForceMultiplier;
+    [SerializeField] private Vector2 offsetOnSelected;
+    [SerializeField] private float durationAnimationOnSelected;
+
+    public Transform Transform { get => transform; }
+
+    public void Select()
+    {
+        SaferioTween.PositionAsync(transform, transform.position + (Vector3)offsetOnSelected, duration: durationAnimationOnSelected);
+    }
 
     public void BreakJoint()
     {
@@ -24,6 +33,6 @@ public class BasicScrew : MonoBehaviour, IScrew
 
         // screwRigidBody.AddForce(force);
 
-        transform.position = Vector2.Lerp(transform.position, position, moveForceMultiplier);
+        // transform.position = Vector2.Lerp(transform.position, position, moveForceMultiplier);
     }
 }
