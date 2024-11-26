@@ -1244,9 +1244,10 @@ Transform:
   m_Children:
   - {fileID: 1203470761}
   - {fileID: 1666113427}
+  - {fileID: 1479378611}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1580856490
+--- !u!1 &1479378609
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1254,46 +1255,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1580856492}
-  - component: {fileID: 1580856491}
+  - component: {fileID: 1479378611}
+  - component: {fileID: 1479378610}
   m_Layer: 0
-  m_Name: Object Pooling Everything
+  m_Name: Gameplay Ads Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1580856491
+--- !u!114 &1479378610
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1580856490}
+  m_GameObject: {fileID: 1479378609}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c526e242a058da74dbb538e159d1e9a4, type: 3}
+  m_Script: {fileID: 11500000, guid: 710d4283be526b241a9d176f5629f3d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabsWithIdentifier:
-  - prefab: {fileID: 8945915159367500476, guid: f706f40e4712cea4e9dae409d7d30d40, type: 3}
-    identifier: SelectScrew
-  - prefab: {fileID: 8945915159367500476, guid: 8e4df1b16fc54bc4f8256922c2aed89c, type: 3}
-    identifier: PutScrew
---- !u!4 &1580856492
+--- !u!4 &1479378611
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1580856490}
+  m_GameObject: {fileID: 1479378609}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1366956625}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1666113426
 GameObject:
@@ -1629,8 +1625,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 160
-  m_fontSizeBase: 160
+  m_fontSize: 140
+  m_fontSizeBase: 140
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1904,7 +1900,6 @@ SceneRoots:
   - {fileID: 2087570171}
   - {fileID: 523229440}
   - {fileID: 1366956625}
-  - {fileID: 1580856492}
   - {fileID: 496743158}
   - {fileID: 2068333487}
   - {fileID: 664633955}

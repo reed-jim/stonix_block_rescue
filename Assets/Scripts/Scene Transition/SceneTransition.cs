@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using PrimeTween;
 using Saferio.Util.SaferioTween;
 using TMPro;
 using UnityEngine;

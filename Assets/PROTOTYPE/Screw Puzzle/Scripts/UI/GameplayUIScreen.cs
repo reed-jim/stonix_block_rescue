@@ -17,11 +17,15 @@ public class GameplayUIScreen : MonoBehaviour
 
     private Vector2 _canvasSize;
 
+    #region ACTION
     public static event Action replayEvent;
+    public static event Action showInterstitialAdEvent;
+    #endregion
 
     private void Awake()
     {
         WinChecker.winLevelEvent += OnWin;
+        UnityAdsInterstitial.interstitialAdCompletedEvent += ActualReplayLevel;
 
         homeButton.onClick.AddListener(BackHome);
         replayButton.onClick.AddListener(Replay);
@@ -37,24 +41,36 @@ public class GameplayUIScreen : MonoBehaviour
     private void OnDestroy()
     {
         WinChecker.winLevelEvent -= OnWin;
+        UnityAdsInterstitial.interstitialAdCompletedEvent -= ActualReplayLevel;
     }
 
     private void BackHome()
     {
-        SceneManager.LoadSceneAsync("Home");
+        PlaySoundClick();
+
+        SceneManager.LoadSceneAsync("Menu");
     }
 
     private void Replay()
     {
-        replayEvent?.Invoke();
+        PlaySoundClick();
 
         winTextRT.gameObject.SetActive(false);
         continueButtonRT.gameObject.SetActive(false);
         fadeBackground.gameObject.SetActive(false);
+
+        showInterstitialAdEvent?.Invoke();
+    }
+
+    private void ActualReplayLevel()
+    {
+        replayEvent?.Invoke();
     }
 
     private void OnWin()
     {
+        PlaySoundWin();
+
         winTextRT.localPosition = new Vector2(0, _canvasSize.y);
         continueButtonRT.localPosition = new Vector2(0, -_canvasSize.y);
 
@@ -66,5 +82,23 @@ public class GameplayUIScreen : MonoBehaviour
         SaferioTween.AlphaAsync(fadeBackground, 0.9f, duration: 0.5f);
         SaferioTween.LocalPositionAsync(winTextRT, new Vector2(0, 0.2f * _canvasSize.y), duration: 0.5f);
         SaferioTween.LocalPositionAsync(continueButtonRT, new Vector2(0, -0.2f * _canvasSize.y), duration: 0.5f);
+    }
+
+    private void PlaySoundClick()
+    {
+        AudioSource selectSound = ObjectPoolingEverything.GetFromPool("ClickSound").GetComponent<AudioSource>();
+
+        selectSound.gameObject.SetActive(true);
+
+        selectSound.Play();
+    }
+
+    private void PlaySoundWin()
+    {
+        AudioSource selectSound = ObjectPoolingEverything.GetFromPool("WinSound").GetComponent<AudioSource>();
+
+        selectSound.gameObject.SetActive(true);
+
+        selectSound.Play();
     }
 }

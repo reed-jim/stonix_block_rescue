@@ -139,7 +139,7 @@ MonoBehaviour:
   screwSprite: {fileID: 3388914690921750373}
   joint: {fileID: 8436318190418098489}
   offsetOnSelected: {x: 0, y: 3}
-  durationAnimationOnSelected: 0.3
+  durationAnimationOnSelected: 0.2
 --- !u!212 &7294795005463920984
 SpriteRenderer:
   m_ObjectHideFlags: 0

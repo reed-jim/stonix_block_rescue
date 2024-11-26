@@ -13,6 +13,17 @@ public class UIScreen : MonoBehaviour
 
     private void Play()
     {
+        PlaySoundClick();
+
         SceneManager.LoadSceneAsync("Screw Puzzle");
+    }
+
+    private void PlaySoundClick()
+    {
+        AudioSource selectSound = ObjectPoolingEverything.GetFromPool("ClickSound").GetComponent<AudioSource>();
+
+        selectSound.gameObject.SetActive(true);
+
+        selectSound.Play();
     }
 }
