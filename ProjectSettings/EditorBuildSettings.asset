@@ -8,12 +8,18 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Gameplay.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/PROTOTYPE/Screw Puzzle/Scene/Menu.unity
     guid: 5bd244a71361de2488797734f15dcca3
-  - enabled: 1
+  - enabled: 0
     path: Assets/PROTOTYPE/Screw Puzzle/Scene/Screw Puzzle.unity
     guid: 293e7aa226530f547a45f5d8a9012e9e
+  - enabled: 1
+    path: Assets/PROTOTYPE/Delete Master/Scenes/Delete Master - Menu.unity
+    guid: a46e0219959ada545baae6a77024d5f4
+  - enabled: 1
+    path: Assets/PROTOTYPE/Delete Master/Scenes/Delete Master - Gameplay.unity
+    guid: 77a9cb6f554f98c44b69ec2f51d15683
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
