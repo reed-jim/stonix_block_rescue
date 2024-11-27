@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Emgu.CV.Bitmap</id>
+    <version>4.9.0.5494</version>
+    <title>Bitmap extension for Emgu CV</title>
+    <authors>Emgu Corporation</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>nuget_icon.png</icon>
+    <readme>docs/README.md</readme>
+    <projectUrl>https://www.emgu.com/</projectUrl>
+    <description>This package add extension method to convert Bitmap to and from Emgu objects (e.g. Mat, UMat, GpuMat)</description>
+    <releaseNotes>This is the 4.9.0 release of Emgu CV. For online documentation please visit
+https://www.emgu.com/wiki/files/4.9.0/document/index.html</releaseNotes>
+    <copyright>© Emgu Corporation 2024. All rights reserved.</copyright>
+    <tags>opencv emgu emgucv ai image bitmap mat umat</tags>
+    <repository type="git" url="https://github.com/emgucv/emgucv" commit="6f7138272dddb78c07ace2569f302be8b9b1402c" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Emgu.CV" version="4.9.0.5494" exclude="Build,Analyzers" />
+        <dependency id="System.Drawing.Common" version="8.0.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
