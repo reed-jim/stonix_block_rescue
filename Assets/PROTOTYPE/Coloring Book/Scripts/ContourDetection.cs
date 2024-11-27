@@ -15,6 +15,10 @@ public class ImageSegmenter : MonoBehaviour
     private Texture2D texture;
     private Mat image;
 
+    [SerializeField] private double thresh;
+    [SerializeField] private double threshLinking;
+    [SerializeField] private int blurRadius;
+
     void Start()
     {
         // Step 1: Get the texture from the SpriteRenderer
@@ -34,11 +38,71 @@ public class ImageSegmenter : MonoBehaviour
 
         Image<Gray, byte> grayImage = image.Convert<Gray, byte>();
 
-        Image<Gray, byte> edges = grayImage.Canny(100, 200);
+        Image<Gray, byte> edges = grayImage.Canny(thresh, threshLinking);
+
+        Mat binaryImage = new Mat();
+        CvInvoke.Threshold(edges, binaryImage, 128, 255, ThresholdType.Binary);
+
+        Mat floodFillImage = new Mat();
+        binaryImage.ConvertTo(floodFillImage, DepthType.Cv32S, 1.0);
+
+        CvInvoke.GaussianBlur(edges, edges, new System.Drawing.Size(blurRadius, blurRadius), 0);
 
         var contours = new VectorOfVectorOfPoint();
         var hierarchy = new Mat();
         CvInvoke.FindContours(edges, contours, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+
+
+        // Step 5: Create a new image to highlight the contours
+        Image<Bgr, byte> contourHighlightedImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0)); // Black background
+
+        // Step 6: Fill the contours and draw on the new image (highlighted in red)
+        for (int i = 0; i < contours.Size; i++)
+        {
+            // Fill the contour (using thickness = -1 to fill it) and highlight in red
+            CvInvoke.DrawContours(contourHighlightedImage, contours, i, new MCvScalar(225, 225, 225), -1); // Red color, filled
+        }
+
+        // Texture2D generatedTexture = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
+
+        // for (int y = 0; y < generatedTexture.height; y++)
+        // {
+        //     for (int x = 0; x < generatedTexture.width; x++)
+        //     {
+        //         // Adjust the pixel position by the bounding box offset
+        //         System.Drawing.Point segmentPoint = new System.Drawing.Point(x, y);
+
+        //         for (int j = 0; j < contours.Size; j++)
+        //         {
+        //             bool isInside = CvInvoke.PointPolygonTest(contours[j], segmentPoint, true) >= 0f;
+
+        //             if (!isInside)
+        //             {
+        //                 Bgr pixel = image[y, x];
+        //                 generatedTexture.SetPixel(x, y, new UnityEngine.Color((float)pixel.Red / 255f, (float)pixel.Green / 255f, (float)pixel.Blue / 255f, 1f)); // Opaque
+        //             }
+        //             else
+        //             {
+        //                 generatedTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0f, 0f, 1f));
+        //             }
+        //         }
+        //     }
+        // }
+
+        // generatedTexture.Apply();
+
+        // Step 7: Convert the highlighted contour image to a Texture2D
+        Texture2D contourTexture = ImageToTexture(edges);
+
+        // Step 8: Create a new sprite from the texture
+        Sprite contourSprite = Sprite.Create(contourTexture, new Rect(0, 0, contourTexture.width, contourTexture.height), new Vector2(0.5f, 0.5f));
+
+        // Step 9: Replace the sprite in the SpriteRenderer
+        originalSpriteRenderer.sprite = contourSprite;
+
+
+
+
 
         // Step 5: Process each contour (segment)
         for (int i = 0; i < contours.Size; i++)
@@ -52,32 +116,39 @@ public class ImageSegmenter : MonoBehaviour
             image.CopyTo(segment);    // Copy the ROI into the segment image
             image.ROI = System.Drawing.Rectangle.Empty; // Reset the ROI
 
-            // Step 7: Create a mask for the contour (inside the contour is white, outside is black)
-            Image<Gray, byte> mask = new Image<Gray, byte>(boundingBox.Width, boundingBox.Height);
-            mask.SetZero();  // Start with a black (transparent) mask
-            Point[] contourArray = contours[i].ToArray();  // Convert contour to array of points
-
-            // Convert the Point[] array to VectorOfPoint
-            VectorOfPoint contourVector = new VectorOfPoint(contourArray);
-
-            // Step 8: Draw the contour on the mask (white)
-            // Create a VectorOfVectorOfPoint to hold all contours for FillPoly
-            VectorOfVectorOfPoint contoursToFill = new VectorOfVectorOfPoint();
-            contoursToFill.Push(contourVector);  // Push the single contour into the container
-
-            // Use FillPoly with VectorOfVectorOfPoint
-            CvInvoke.FillPoly(mask, contoursToFill, new MCvScalar(255));  // Use VectorOfVectorOfPoint
-
-            // Step 9: Apply the mask to the segment (set outside alpha to 0)
-            ApplyMaskToSegment(segment, mask);
-
-            // Step 10: Convert the masked segment into a Texture2D
+            // Step 7: Convert the segment to a Texture2D
             Texture2D segmentTexture = ImageToTexture(segment);
 
-            // Step 11: Create a sprite from the masked segment texture
+            // Step 8: Check if each pixel is inside the contour using PointPolygonTest
+            for (int y = 0; y < segment.Height; y++)
+            {
+                for (int x = 0; x < segment.Width; x++)
+                {
+                    // Adjust the pixel position by the bounding box offset
+                    System.Drawing.Point segmentPoint = new System.Drawing.Point(x + boundingBox.X, y + boundingBox.Y);
+
+                    // Check if the pixel (segmentPoint) is inside the contour
+                    bool isInside = CvInvoke.PointPolygonTest(contours[i], segmentPoint, true) >= 0f;
+
+                    // If the pixel is inside the contour, make it visible (alpha = 1)
+                    if (isInside)
+                    {
+                        Bgr pixel = segment[y, x];
+                        segmentTexture.SetPixel(x, y, new UnityEngine.Color((float)pixel.Red / 255f, (float)pixel.Green / 255f, (float)pixel.Blue / 255f, 1f)); // Opaque
+                    }
+                    else
+                    {
+                        segmentTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0f, 0f, 0f));
+                    }
+                }
+            }
+
+            segmentTexture.Apply();  // Apply changes to the texture
+
+            // Step 9: Create a sprite from the modified segment texture
             Sprite newSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
 
-            // Step 12: Spawn a new GameObject to visualize the sprite
+            // Step 10: Spawn a new GameObject to visualize the sprite
             GameObject newSegmentObject = Instantiate(spritePrefab, transform.position, Quaternion.identity);
             newSegmentObject.GetComponent<SpriteRenderer>().sprite = newSprite;
 
@@ -85,7 +156,7 @@ public class ImageSegmenter : MonoBehaviour
             newSegmentObject.transform.position = new Vector3((float)boundingBox.X / texture.width, (float)boundingBox.Y / texture.height, 0);
         }
 
-        originalSpriteRenderer.gameObject.SetActive(false);
+        // originalSpriteRenderer.gameObject.SetActive(false);
     }
 
     #region UTIL
@@ -119,7 +190,33 @@ public class ImageSegmenter : MonoBehaviour
         return image;
     }
 
-    // Convert EmguCV Image<Bgr, byte> to Texture2D
+    private Texture2D ImageToTexture(Image<Gray, byte> grayImage)
+    {
+        // Create a new Texture2D with the same width and height as the Emgu CV image
+        Texture2D texture = new Texture2D(grayImage.Width, grayImage.Height);
+
+        // Loop through each pixel and convert the grayscale value to a Unity Color
+        for (int y = 0; y < grayImage.Height; y++)
+        {
+            for (int x = 0; x < grayImage.Width; x++)
+            {
+                // Get the grayscale pixel value (0 to 255)
+                byte pixelValue = grayImage.Data[y, x, 0];
+
+                // Convert the pixel value to a Unity Color (grayscale value as R, G, B)
+                UnityEngine.Color color = new UnityEngine.Color(pixelValue / 255f, pixelValue / 255f, pixelValue / 255f);
+
+                // Set the pixel on the Texture2D
+                texture.SetPixel(x, y, color);
+            }
+        }
+
+        // Apply the changes to the texture
+        texture.Apply();
+
+        return texture;
+    }
+
     private Texture2D ImageToTexture(Image<Bgr, byte> image)
     {
         Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.RGBA32, false);
