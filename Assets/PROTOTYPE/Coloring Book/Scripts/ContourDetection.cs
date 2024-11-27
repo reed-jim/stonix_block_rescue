@@ -18,6 +18,7 @@ public class ImageSegmenter : MonoBehaviour
     [SerializeField] private double thresh;
     [SerializeField] private double threshLinking;
     [SerializeField] private int blurRadius;
+    [SerializeField] float minContourArea = 100.0f;
 
     void Start()
     {
@@ -60,7 +61,7 @@ public class ImageSegmenter : MonoBehaviour
         for (int i = 0; i < contours.Size; i++)
         {
             // Fill the contour (using thickness = -1 to fill it) and highlight in red
-            CvInvoke.DrawContours(contourHighlightedImage, contours, i, new MCvScalar(225, 225, 225), 1); // Red color, filled
+            CvInvoke.DrawContours(contourHighlightedImage, contours, i, new MCvScalar(225, 225, 225), -1); // Red color, filled
         }
 
         // Texture2D generatedTexture = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
@@ -102,12 +103,18 @@ public class ImageSegmenter : MonoBehaviour
 
 
 
-
+        Debug.Log(originalSpriteRenderer.sprite.bounds.size);
 
         // Step 5: Process each contour (segment)
         for (int i = 0; i < contours.Size; i++)
         {
-            // Extract the bounding box for each contour (a segment)
+            double contourArea = CvInvoke.ContourArea(contours[i]);
+
+            if (contourArea < minContourArea)
+            {
+                continue;
+            }
+
             Rectangle boundingBox = CvInvoke.BoundingRectangle(contours[i]);
 
             // Step 6: Extract the segment from the original image
@@ -153,10 +160,37 @@ public class ImageSegmenter : MonoBehaviour
             newSegmentObject.GetComponent<SpriteRenderer>().sprite = newSprite;
 
             // Position the new sprite object based on the contour's bounding box
-            newSegmentObject.transform.position = new Vector3((float)boundingBox.X / texture.width, (float)boundingBox.Y / texture.height, 0);
+
+            Vector2 spriteSize = originalSpriteRenderer.sprite.bounds.size;
+
+            newSegmentObject.transform.position = new Vector3(spriteSize.x * ((float)boundingBox.Location.X) / image.Width,
+                spriteSize.y * ((float)boundingBox.Location.Y - image.Height) / image.Height, 0);
+
+            // newSegmentObject.transform.localScale = transform.localScale;
+            
+            // newSegmentObject.transform.localScale = new Vector2(
+            //     (newSegmentObject.transform.localScale.x * spriteSize.x * (float)boundingBox.X / texture.width) / newSprite.bounds.size.x,
+            //     (newSegmentObject.transform.localScale.y * spriteSize.y * (float)boundingBox.Y / texture.height) / newSprite.bounds.size.y
+            // );
         }
 
         // originalSpriteRenderer.gameObject.SetActive(false);
+    }
+
+    Vector3 BoundingRectToWorldSpacePosition(Rectangle boundingRect, int imageWidth, int imageHeight)
+    {
+        // Convert the top-left corner of the bounding box to normalized screen coordinates
+        float normalizedX = (float)boundingRect.X / imageWidth;
+        float normalizedY = 1 - (float)(boundingRect.Y + boundingRect.Height) / imageHeight;  // Y axis is flipped in Unity
+
+        // Convert the normalized coordinates to screen coordinates (pixel space)
+        Vector3 screenPosition = new Vector3(normalizedX * Screen.width, normalizedY * Screen.height, 0);
+
+        // Convert screen coordinates to world space
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+
+        // Return the world position of the top-left corner of the bounding box
+        return worldPosition;
     }
 
     #region UTIL
