@@ -2,63 +2,93 @@ using UnityEngine;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
-using System;
+using System.Collections.Generic;
 using Emgu.CV.Util;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
-public class EmguCVContourDetection : MonoBehaviour
+public class ImageSegmenter : MonoBehaviour
 {
-    public SpriteRenderer spriteRenderer;
-    public Sprite spritePrefab;
-    public Texture2D inputTexture;
+    public SpriteRenderer originalSpriteRenderer; // The original SpriteRenderer
+    public GameObject spritePrefab;  // Prefab used to display segments (with SpriteRenderer)
+
+    private Texture2D texture;
+    private Mat image;
 
     void Start()
     {
-        // Convert Texture2D to EmguCV Image
-        Image<Bgr, byte> image = TextureToImage(inputTexture);
+        // Step 1: Get the texture from the SpriteRenderer
+        texture = originalSpriteRenderer.sprite.texture;
 
-        // Convert to grayscale
+        // Convert the texture to a Mat (Emgu.CV Mat) for processing
+        image = new Mat(texture.height, texture.width, DepthType.Cv8U, 3); // Assuming 3 channels (RGB)
+        texture.GetPixels32();  // Get the texture pixels for processing
+
+        // Step 2: Process the texture to detect boundaries/objects
+        ProcessImageAndSegment();
+    }
+
+    void ProcessImageAndSegment()
+    {
+        Image<Bgr, byte> image = TextureToImage(originalSpriteRenderer.sprite.texture);
+
         Image<Gray, byte> grayImage = image.Convert<Gray, byte>();
 
-        // Apply Canny edge detection
         Image<Gray, byte> edges = grayImage.Canny(100, 200);
 
-        // Find contours
         var contours = new VectorOfVectorOfPoint();
         var hierarchy = new Mat();
         CvInvoke.FindContours(edges, contours, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxSimple);
 
-        // Create a copy of the original image to draw contours on it
-        Image<Bgr, byte> imageWithContours = image.Copy();
-
-        // Loop through the contours and draw them with random colors
-        System.Random random = new System.Random();
+        // Step 5: Process each contour (segment)
         for (int i = 0; i < contours.Size; i++)
         {
-            // Generate a random color for each contour
-            MCvScalar randomColor = new MCvScalar(
-                random.Next(0, 256), // Blue (0 to 255)
-                random.Next(0, 256), // Green (0 to 255)
-                random.Next(0, 256)  // Red (0 to 255)
-            );
-
-            // Draw the contour with the random color
-            CvInvoke.DrawContours(imageWithContours, contours, i, randomColor, 2, LineType.EightConnected, hierarchy, 0);
-
+            // Extract the bounding box for each contour (a segment)
             Rectangle boundingBox = CvInvoke.BoundingRectangle(contours[i]);
 
-            // Spawn the sprite at the center of the bounding box
-            SpawnSpriteWithRegion(boundingBox);
+            // Step 6: Extract the segment from the original image
+            Image<Bgr, byte> segment = new Image<Bgr, byte>(boundingBox.Width, boundingBox.Height);
+            image.ROI = boundingBox;  // Set region of interest (ROI)
+            image.CopyTo(segment);    // Copy the ROI into the segment image
+            image.ROI = System.Drawing.Rectangle.Empty; // Reset the ROI
+
+            // Step 7: Create a mask for the contour (inside the contour is white, outside is black)
+            Image<Gray, byte> mask = new Image<Gray, byte>(boundingBox.Width, boundingBox.Height);
+            mask.SetZero();  // Start with a black (transparent) mask
+            Point[] contourArray = contours[i].ToArray();  // Convert contour to array of points
+
+            // Convert the Point[] array to VectorOfPoint
+            VectorOfPoint contourVector = new VectorOfPoint(contourArray);
+
+            // Step 8: Draw the contour on the mask (white)
+            // Create a VectorOfVectorOfPoint to hold all contours for FillPoly
+            VectorOfVectorOfPoint contoursToFill = new VectorOfVectorOfPoint();
+            contoursToFill.Push(contourVector);  // Push the single contour into the container
+
+            // Use FillPoly with VectorOfVectorOfPoint
+            CvInvoke.FillPoly(mask, contoursToFill, new MCvScalar(255));  // Use VectorOfVectorOfPoint
+
+            // Step 9: Apply the mask to the segment (set outside alpha to 0)
+            ApplyMaskToSegment(segment, mask);
+
+            // Step 10: Convert the masked segment into a Texture2D
+            Texture2D segmentTexture = ImageToTexture(segment);
+
+            // Step 11: Create a sprite from the masked segment texture
+            Sprite newSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
+
+            // Step 12: Spawn a new GameObject to visualize the sprite
+            GameObject newSegmentObject = Instantiate(spritePrefab, transform.position, Quaternion.identity);
+            newSegmentObject.GetComponent<SpriteRenderer>().sprite = newSprite;
+
+            // Position the new sprite object based on the contour's bounding box
+            newSegmentObject.transform.position = new Vector3((float)boundingBox.X / texture.width, (float)boundingBox.Y / texture.height, 0);
         }
 
-        // Convert the image back to Texture2D to display it in Unity
-        Texture2D outputTexture = ImageToTexture(imageWithContours);
-
-        Sprite newSprite = Sprite.Create(outputTexture, new Rect(0, 0, outputTexture.width, outputTexture.height), new Vector2(0.5f, 0.5f));
-        spriteRenderer.sprite = newSprite;
+        originalSpriteRenderer.gameObject.SetActive(false);
     }
 
-    // Convert Texture2D to EmguCV Image<Bgr, byte>
+    #region UTIL
     private Image<Bgr, byte> TextureToImage(Texture2D texture)
     {
         int width = texture.width;
@@ -92,62 +122,80 @@ public class EmguCVContourDetection : MonoBehaviour
     // Convert EmguCV Image<Bgr, byte> to Texture2D
     private Texture2D ImageToTexture(Image<Bgr, byte> image)
     {
-        // Create a new Texture2D with the same size as the image
-        Texture2D texture = new Texture2D(image.Width, image.Height);
+        Texture2D texture = new Texture2D(image.Width, image.Height, TextureFormat.RGBA32, false);
 
-        // Convert Image<Bgr, byte> to Texture2D
+        // Copy image data to Texture2D
         for (int y = 0; y < image.Height; y++)
         {
             for (int x = 0; x < image.Width; x++)
             {
-                Bgr color = image[y, x];
-                texture.SetPixel(x, y, new UnityEngine.Color32((byte)color.Blue, (byte)color.Green, (byte)color.Red, 255));
+                Bgr pixel = image[y, x];
+                texture.SetPixel(x, y, new UnityEngine.Color((float)pixel.Red / 255f, (float)pixel.Green / 255f, (float)pixel.Blue / 255f, 1f)); // Alpha = 1
             }
         }
+        texture.Apply();  // Apply the changes to the texture
 
-        texture.Apply();
         return texture;
     }
 
-    private void SpawnSpriteWithRegion(Rectangle boundingBox)
+    Mat TextureToMat(Texture2D texture)
     {
-        // Crop the region from the original texture based on the bounding box
-        Texture2D regionTexture = CropTexture(inputTexture, boundingBox);
+        // Get the pixel data from the texture
+        Color32[] pixels = texture.GetPixels32();
+        int width = texture.width;
+        int height = texture.height;
 
-        // Convert the cropped texture to a sprite
-        Sprite regionSprite = Sprite.Create(regionTexture, new Rect(0, 0, regionTexture.width, regionTexture.height), new Vector2(0.5f, 0.5f));
+        // Create a byte array to hold the pixel data in BGR format
+        byte[] bytes = new byte[width * height * 3];  // 3 channels for BGR format
+        int index = 0;
 
-        // Create a new GameObject for the sprite
-        GameObject spriteObject = new GameObject("RegionSprite");
-        SpriteRenderer spriteRenderer = spriteObject.AddComponent<SpriteRenderer>();
-        spriteRenderer.sprite = regionSprite;
-
-        // Set the sprite's position to the center of the bounding box
-        Vector3 spawnPosition = new Vector3(boundingBox.X + boundingBox.Width / 2, boundingBox.Y + boundingBox.Height / 2, 0);
-        spriteObject.transform.position = spawnPosition;
-
-        // Scale the sprite based on the size of the bounding box
-        spriteObject.transform.localScale = new Vector3(boundingBox.Width / 100f, boundingBox.Height / 100f, 1);
-    }
-
-    // Function to crop the original texture based on the bounding box
-    private Texture2D CropTexture(Texture2D originalTexture, Rectangle boundingBox)
-    {
-        // Create a new Texture2D with the size of the bounding box
-        Texture2D croppedTexture = new Texture2D(boundingBox.Width, boundingBox.Height);
-
-        // Copy the pixels from the original texture to the cropped texture
-        for (int y = 0; y < boundingBox.Height; y++)
+        // Convert each pixel (Color32) into a byte array (BGR format)
+        for (int i = 0; i < pixels.Length; i++)
         {
-            for (int x = 0; x < boundingBox.Width; x++)
-            {
-                // Get the pixel from the original texture and set it in the cropped texture
-                UnityEngine.Color pixelColor = originalTexture.GetPixel(boundingBox.X + x, boundingBox.Y + y);
-                croppedTexture.SetPixel(x, y, pixelColor);
-            }
+            bytes[index++] = pixels[i].b;  // Blue
+            bytes[index++] = pixels[i].g;  // Green
+            bytes[index++] = pixels[i].r;  // Red
         }
 
-        croppedTexture.Apply();
-        return croppedTexture;
+        // Create an empty Mat with the required size (width, height) and depth (8-bit unsigned)
+        // Mat with 3 channels (RGB), DepthType.Cv8U means 8-bit unsigned integer for each channel
+        Mat mat = new Mat(height, width, Emgu.CV.CvEnum.DepthType.Cv8U, 3);
+
+        // Copy the pixel data into the Mat
+        mat.SetTo(bytes);
+
+        return mat;
     }
+
+    Texture2D ConvertMatToTexture(Mat mat)
+    {
+        // Create a new Texture2D to hold the image
+        Texture2D texture = new Texture2D(mat.Width, mat.Height, TextureFormat.RGB24, false);
+
+        // Get the raw image data from the Mat
+        byte[] data = new byte[mat.Width * mat.Height * 3]; // 3 for RGB channels
+        Marshal.Copy(mat.DataPointer, data, 0, data.Length);
+
+        // Load the raw texture data into the Texture2D
+        texture.LoadRawTextureData(data);
+        texture.Apply();  // Apply the changes to the texture
+
+        return texture;
+    }
+
+    void ApplyMaskToSegment(Image<Bgr, byte> segment, Image<Gray, byte> mask)
+    {
+        for (int y = 0; y < segment.Height; y++)
+        {
+            for (int x = 0; x < segment.Width; x++)
+            {
+                byte maskValue = mask.Data[y, x, 0];  // Get mask value at this pixel (0 for black, 255 for white)
+                if (maskValue == 0) // If the pixel is black (outside the contour)
+                {
+                    segment[y, x] = new Bgr(50, 0, 0);  // Set pixel to black (transparent for Unity)
+                }
+            }
+        }
+    }
+    #endregion
 }
