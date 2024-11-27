@@ -27,7 +27,7 @@ public class RegionExtraction : MonoBehaviour
 
         Texture2D exampleTexture = new Texture2D(inputTexture.width, inputTexture.height, TextureFormat.RGBA32, false);
 
-        foreach (var pixel in regions[2])
+        foreach (var pixel in regions[1])
         {
             exampleTexture.SetPixel(pixel.x, pixel.y, inputTexture.GetPixel(pixel.x, pixel.y));
         }
@@ -41,15 +41,47 @@ public class RegionExtraction : MonoBehaviour
     // Step 1: Edge detection using a simple threshold (no shaders)
     Texture2D GetEdgeMap(Texture2D inputTexture)
     {
-        Texture2D edgeMap = new Texture2D(inputTexture.width, inputTexture.height);
+        int width = inputTexture.width;
+        int height = inputTexture.height;
 
-        for (int y = 0; y < inputTexture.height; y++)
+        Texture2D edgeMap = new Texture2D(width, height);
+
+        // Sobel kernels for detecting horizontal and vertical gradients
+        int[,] sobelX = new int[3, 3] {
+        { -1,  0,  1 },
+        { -2,  0,  2 },
+        { -1,  0,  1 }
+    };
+        int[,] sobelY = new int[3, 3] {
+        { -1, -2, -1 },
+        {  0,  0,  0 },
+        {  1,  2,  1 }
+    };
+
+        // Apply Sobel filter to calculate gradients
+        for (int y = 1; y < height - 1; y++)
         {
-            for (int x = 0; x < inputTexture.width; x++)
+            for (int x = 1; x < width - 1; x++)
             {
-                Color pixelColor = inputTexture.GetPixel(x, y);
-                float brightness = pixelColor.grayscale; // Convert color to grayscale
-                edgeMap.SetPixel(x, y, brightness > 0.5f ? Color.white : Color.black); // Thresholding for edges
+                int gradientX = 0;
+                int gradientY = 0;
+
+                // Apply Sobel kernels on the 3x3 neighborhood of the current pixel
+                for (int i = -1; i <= 1; i++)
+                {
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        Color pixelColor = inputTexture.GetPixel(x + i, y + j);
+                        float brightness = pixelColor.grayscale;
+
+                        gradientX += (int)(brightness * sobelX[i + 1, j + 1]);
+                        gradientY += (int)(brightness * sobelY[i + 1, j + 1]);
+                    }
+                }
+
+                // Calculate the magnitude of the gradient
+                float magnitude = Mathf.Sqrt(gradientX * gradientX + gradientY * gradientY);
+                edgeMap.SetPixel(x, y, magnitude > 0.0f ? Color.white : Color.black); // Adjust threshold
             }
         }
 
