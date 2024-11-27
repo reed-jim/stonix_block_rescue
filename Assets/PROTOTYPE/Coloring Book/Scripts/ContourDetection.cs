@@ -50,7 +50,7 @@ public class ImageSegmenter : MonoBehaviour
 
         var contours = new VectorOfVectorOfPoint();
         var hierarchy = new Mat();
-        CvInvoke.FindContours(edges, contours, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+        CvInvoke.FindContours(edges, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxSimple);
 
 
         // Step 5: Create a new image to highlight the contours
@@ -60,7 +60,7 @@ public class ImageSegmenter : MonoBehaviour
         for (int i = 0; i < contours.Size; i++)
         {
             // Fill the contour (using thickness = -1 to fill it) and highlight in red
-            CvInvoke.DrawContours(contourHighlightedImage, contours, i, new MCvScalar(225, 225, 225), -1); // Red color, filled
+            CvInvoke.DrawContours(contourHighlightedImage, contours, i, new MCvScalar(225, 225, 225), 1); // Red color, filled
         }
 
         // Texture2D generatedTexture = new Texture2D(texture.width, texture.height, TextureFormat.RGBA32, false);
@@ -92,7 +92,7 @@ public class ImageSegmenter : MonoBehaviour
         // generatedTexture.Apply();
 
         // Step 7: Convert the highlighted contour image to a Texture2D
-        Texture2D contourTexture = ImageToTexture(edges);
+        Texture2D contourTexture = ImageToTexture(contourHighlightedImage);
 
         // Step 8: Create a new sprite from the texture
         Sprite contourSprite = Sprite.Create(contourTexture, new Rect(0, 0, contourTexture.width, contourTexture.height), new Vector2(0.5f, 0.5f));

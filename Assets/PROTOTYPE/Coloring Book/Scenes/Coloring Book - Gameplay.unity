@@ -414,7 +414,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 74cc3fa58469e5641a77dff5273ae6a8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 30439974f41364d43bc701cdd9d2956a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -456,7 +456,7 @@ MonoBehaviour:
   spritePrefab: {fileID: 9147805768947195604, guid: 57600513726ad5a46b0128467106d87a, type: 3}
   thresh: 100
   threshLinking: 200
-  blurRadius: 27
+  blurRadius: 9
 --- !u!1 &1001717466
 GameObject:
   m_ObjectHideFlags: 0
