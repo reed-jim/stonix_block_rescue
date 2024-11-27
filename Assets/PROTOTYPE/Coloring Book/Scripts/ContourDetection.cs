@@ -53,7 +53,6 @@ public class ImageSegmenter : MonoBehaviour
         var hierarchy = new Mat();
         CvInvoke.FindContours(edges, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxSimple);
 
-
         // Step 5: Create a new image to highlight the contours
         Image<Bgr, byte> contourHighlightedImage = new Image<Bgr, byte>(image.Width, image.Height, new Bgr(0, 0, 0)); // Black background
 
@@ -100,10 +99,6 @@ public class ImageSegmenter : MonoBehaviour
 
         // Step 9: Replace the sprite in the SpriteRenderer
         originalSpriteRenderer.sprite = contourSprite;
-
-
-
-        Debug.Log(originalSpriteRenderer.sprite.bounds.size);
 
         // Step 5: Process each contour (segment)
         for (int i = 0; i < contours.Size; i++)
@@ -159,22 +154,21 @@ public class ImageSegmenter : MonoBehaviour
             GameObject newSegmentObject = Instantiate(spritePrefab, transform.position, Quaternion.identity);
             newSegmentObject.GetComponent<SpriteRenderer>().sprite = newSprite;
 
+            SpriteRegion spriteRegion = newSegmentObject.AddComponent<SpriteRegion>();
+
+            spriteRegion.Sprite = newSprite;
+
+            newSegmentObject.AddComponent<BoxCollider2D>();
+
             // Position the new sprite object based on the contour's bounding box
 
             Vector2 spriteSize = originalSpriteRenderer.sprite.bounds.size;
 
             newSegmentObject.transform.position = new Vector3(spriteSize.x * ((float)boundingBox.Location.X) / image.Width,
                 spriteSize.y * ((float)boundingBox.Location.Y - image.Height) / image.Height, 0);
-
-            // newSegmentObject.transform.localScale = transform.localScale;
-            
-            // newSegmentObject.transform.localScale = new Vector2(
-            //     (newSegmentObject.transform.localScale.x * spriteSize.x * (float)boundingBox.X / texture.width) / newSprite.bounds.size.x,
-            //     (newSegmentObject.transform.localScale.y * spriteSize.y * (float)boundingBox.Y / texture.height) / newSprite.bounds.size.y
-            // );
         }
 
-        // originalSpriteRenderer.gameObject.SetActive(false);
+        originalSpriteRenderer.gameObject.SetActive(false);
     }
 
     Vector3 BoundingRectToWorldSpacePosition(Rectangle boundingRect, int imageWidth, int imageHeight)
