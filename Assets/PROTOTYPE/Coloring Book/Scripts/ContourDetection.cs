@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Emgu.CV.Util;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Linq;
+using System;
 
 public class ImageSegmenter : MonoBehaviour
 {
@@ -13,12 +15,23 @@ public class ImageSegmenter : MonoBehaviour
     public GameObject spritePrefab;  // Prefab used to display segments (with SpriteRenderer)
 
     private Texture2D texture;
-    private Mat image;
+    private Mat spriteMat;
 
     [SerializeField] private double thresh;
     [SerializeField] private double threshLinking;
     [SerializeField] private int blurRadius;
     [SerializeField] float minContourArea = 100.0f;
+
+    [SerializeField] private List<UnityEngine.Color> distinctDetectedColors;
+
+    #region ACTION
+    public static event Action<UnityEngine.Color> spawnColorButtonEvent;
+    #endregion  
+
+    private void Awake()
+    {
+        distinctDetectedColors = new List<UnityEngine.Color>();
+    }
 
     void Start()
     {
@@ -26,7 +39,7 @@ public class ImageSegmenter : MonoBehaviour
         texture = originalSpriteRenderer.sprite.texture;
 
         // Convert the texture to a Mat (Emgu.CV Mat) for processing
-        image = new Mat(texture.height, texture.width, DepthType.Cv8U, 3); // Assuming 3 channels (RGB)
+        spriteMat = new Mat(texture.height, texture.width, DepthType.Cv8U, 3); // Assuming 3 channels (RGB)
         texture.GetPixels32();  // Get the texture pixels for processing
 
         // Step 2: Process the texture to detect boundaries/objects
@@ -120,6 +133,7 @@ public class ImageSegmenter : MonoBehaviour
 
             // Step 7: Convert the segment to a Texture2D
             Texture2D segmentTexture = ImageToTexture(segment);
+            Texture2D segmentHighlightTexture = ImageToTexture(segment);
 
             // Step 8: Check if each pixel is inside the contour using PointPolygonTest
             for (int y = 0; y < segment.Height; y++)
@@ -137,25 +151,30 @@ public class ImageSegmenter : MonoBehaviour
                     {
                         Bgr pixel = segment[y, x];
                         segmentTexture.SetPixel(x, y, new UnityEngine.Color((float)pixel.Red / 255f, (float)pixel.Green / 255f, (float)pixel.Blue / 255f, 1f)); // Opaque
+                        segmentHighlightTexture.SetPixel(x, y, new UnityEngine.Color(0.1f, 0.1f, 0.1f, 1f));
                     }
                     else
                     {
                         segmentTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0f, 0f, 0f));
+                        segmentHighlightTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0f, 0f, 0f));
                     }
                 }
             }
 
-            segmentTexture.Apply();  // Apply changes to the texture
+            segmentTexture.Apply();
+            segmentHighlightTexture.Apply();
 
             // Step 9: Create a sprite from the modified segment texture
             Sprite newSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
+            Sprite segmentHighlightSprite = Sprite.Create(segmentHighlightTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
 
             // Step 10: Spawn a new GameObject to visualize the sprite
             GameObject newSegmentObject = Instantiate(spritePrefab, transform.position, Quaternion.identity);
-            newSegmentObject.GetComponent<SpriteRenderer>().sprite = newSprite;
+            newSegmentObject.GetComponent<SpriteRenderer>().sprite = segmentHighlightSprite;
 
-            SpriteRegion spriteRegion = newSegmentObject.AddComponent<SpriteRegion>();
+            SpriteRegion spriteRegion = newSegmentObject.GetComponent<SpriteRegion>();
 
+            spriteRegion.HighlightSprite = segmentHighlightSprite;
             spriteRegion.Sprite = newSprite;
 
             newSegmentObject.AddComponent<BoxCollider2D>();
@@ -166,6 +185,11 @@ public class ImageSegmenter : MonoBehaviour
 
             newSegmentObject.transform.position = new Vector3(spriteSize.x * ((float)boundingBox.Location.X) / image.Width,
                 spriteSize.y * ((float)boundingBox.Location.Y - image.Height) / image.Height, 0);
+
+
+            UnityEngine.Color color = GetMostCommonColorInContour(TextureToMat(segmentTexture), contours[i]);
+
+            spawnColorButtonEvent?.Invoke(color);
         }
 
         originalSpriteRenderer.gameObject.SetActive(false);
@@ -323,4 +347,61 @@ public class ImageSegmenter : MonoBehaviour
         }
     }
     #endregion
+
+
+
+
+
+
+
+    public static UnityEngine.Color GetMostCommonColorInContour(Mat image, VectorOfPoint contour)
+    {
+        // Step 1: Create a mask for the contour
+        Mat mask = new Mat(image.Size, DepthType.Cv8U, 1);  // 1-channel mask
+        mask.SetTo(new MCvScalar(0));  // Initialize the mask to black (0)
+        CvInvoke.FillPoly(mask, new VectorOfVectorOfPoint(new VectorOfPoint[] { contour }), new MCvScalar(255)); // Set contour region to white (255)
+
+        // Step 2: Create a Mat for the ROI (Region of Interest) and extract the region
+        Mat roi = new Mat(image.Size, image.Depth, image.NumberOfChannels);  // Initialize roi with the same size and type as the source image
+
+        // Step 3: Copy the region of interest from the image using the mask
+        image.CopyTo(roi, mask);  // Copy the region from the image to roi where the mask is 255
+
+        // Step 4: Get the raw data of the roi image (roiData) as byte[,,]
+        byte[,,] roiData = roi.ToImage<Bgr, byte>().Data;  // Convert to BGR image and extract the byte[,,] data
+
+        // Step 5: Initialize variables to calculate the average color
+        double sumBlue = 0, sumGreen = 0, sumRed = 0;
+        int pixelCount = 0;
+
+        // Step 6: Iterate through the pixels in the ROI and calculate the sum of BGR channels
+        for (int y = 0; y < roi.Height; y++)
+        {
+            for (int x = 0; x < roi.Width; x++)
+            {
+                // Access the pixel's BGR components directly from the 3D byte array (roiData)
+                byte blue = roiData[y, x, 0];     // Blue channel
+                byte green = roiData[y, x, 1];    // Green channel
+                byte red = roiData[y, x, 2];      // Red channel
+
+                // Accumulate the color values
+                sumBlue += blue;
+                sumGreen += green;
+                sumRed += red;
+                pixelCount++;
+            }
+        }
+
+        // Calculate average values for Blue, Green, and Red channels
+        double avgBlue = sumBlue / pixelCount;
+        double avgGreen = sumGreen / pixelCount;
+        double avgRed = sumRed / pixelCount;
+
+        // Step 8: Return the average color as Unity Color (normalize to [0, 1] range)
+        return new UnityEngine.Color(
+            (float)(avgRed / 255.0),  // Normalize to [0, 1]
+            (float)(avgGreen / 255.0),  // Normalize to [0, 1]
+            (float)(avgBlue / 255.0)    // Normalize to [0, 1]
+        );
+    }
 }

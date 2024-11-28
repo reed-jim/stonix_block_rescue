@@ -17,7 +17,7 @@ public class GameplayInput : MonoBehaviour
 
                 if (spriteRegion != null)
                 {
-                    spriteRegion.gameObject.SetActive(false);
+                    spriteRegion.FillColor();
                 }
             }
         }
