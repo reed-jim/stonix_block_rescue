@@ -189,6 +189,8 @@ public class ImageSegmenter : MonoBehaviour
 
             UnityEngine.Color color = GetMostCommonColorInContour(TextureToMat(segmentTexture), contours[i]);
 
+            spriteRegion.ColorGroup = color;
+
             spawnColorButtonEvent?.Invoke(color);
         }
 
@@ -359,7 +361,7 @@ public class ImageSegmenter : MonoBehaviour
         // Step 1: Create a mask for the contour
         Mat mask = new Mat(image.Size, DepthType.Cv8U, 1);  // 1-channel mask
         mask.SetTo(new MCvScalar(0));  // Initialize the mask to black (0)
-        CvInvoke.FillPoly(mask, new VectorOfVectorOfPoint(new VectorOfPoint[] { contour }), new MCvScalar(255)); // Set contour region to white (255)
+        CvInvoke.FillPoly(mask, new VectorOfVectorOfPoint(new VectorOfPoint[] { contour }), new MCvScalar(0)); // Set contour region to white (255)
 
         // Step 2: Create a Mat for the ROI (Region of Interest) and extract the region
         Mat roi = new Mat(image.Size, image.Depth, image.NumberOfChannels);  // Initialize roi with the same size and type as the source image
@@ -368,28 +370,98 @@ public class ImageSegmenter : MonoBehaviour
         image.CopyTo(roi, mask);  // Copy the region from the image to roi where the mask is 255
 
         // Step 4: Get the raw data of the roi image (roiData) as byte[,,]
-        byte[,,] roiData = roi.ToImage<Bgr, byte>().Data;  // Convert to BGR image and extract the byte[,,] data
+        byte[,,] roiData = roi.ToImage<Bgra, byte>().Data;  // Convert to BGR image and extract the byte[,,] data
 
         // Step 5: Initialize variables to calculate the average color
         double sumBlue = 0, sumGreen = 0, sumRed = 0;
         int pixelCount = 0;
+
+        Dictionary<UnityEngine.Color, int> colorGroups = new Dictionary<UnityEngine.Color, int>();
 
         // Step 6: Iterate through the pixels in the ROI and calculate the sum of BGR channels
         for (int y = 0; y < roi.Height; y++)
         {
             for (int x = 0; x < roi.Width; x++)
             {
-                // Access the pixel's BGR components directly from the 3D byte array (roiData)
-                byte blue = roiData[y, x, 0];     // Blue channel
-                byte green = roiData[y, x, 1];    // Green channel
-                byte red = roiData[y, x, 2];      // Red channel
+                byte blue = roiData[y, x, 0];
+                byte green = roiData[y, x, 1];
+                byte red = roiData[y, x, 2];
 
-                // Accumulate the color values
-                sumBlue += blue;
-                sumGreen += green;
-                sumRed += red;
-                pixelCount++;
+                if (blue == 0 && green == 0 && red == 0)
+                {
+                    continue;
+                }
+
+                UnityEngine.Color colorGroup = new UnityEngine.Color(blue / 255f, green / 255f, red / 255f);
+
+                if (colorGroups.Count == 0)
+                {
+                    colorGroups.Add(colorGroup, 1);
+                }
+                else
+                {
+                    bool isFound = false;
+
+                    foreach (var colorGroupsKey in colorGroups.Keys)
+                    {
+                        float cachedBlue = colorGroupsKey.b;
+                        float cachedGreen = colorGroupsKey.g;
+                        float cachedRed = colorGroupsKey.r;
+
+                        float difference = 0;
+
+                        difference += Mathf.Abs((blue / 255f) - cachedBlue);
+                        difference += Mathf.Abs((green / 255f) - cachedGreen);
+                        difference += Mathf.Abs((red / 255f) - cachedRed);
+
+                        if (difference < 0.2f)
+                        {
+                            colorGroups[colorGroupsKey]++;
+
+                            isFound = true;
+
+                            break;
+                        }
+                        else
+                        {
+
+                        }
+                    }
+
+                    if (!isFound)
+                    {
+                        if (!colorGroups.ContainsKey(colorGroup))
+                        {
+                            colorGroups.Add(colorGroup, 1);
+                        }
+                    }
+                }
+
+                // // Access the pixel's BGR components directly from the 3D byte array (roiData)
+                // byte blue = roiData[y, x, 0];     // Blue channel
+                // byte green = roiData[y, x, 1];    // Green channel
+                // byte red = roiData[y, x, 2];      // Red channel
+
+                // if (blue == 0 && green == 0 && red == 0)
+                // {
+                //     continue;
+                // }
+
+                // // Accumulate the color values
+                // sumBlue += blue;
+                // sumGreen += green;
+                // sumRed += red;
+                // pixelCount++;
             }
+        }
+
+        if (colorGroups.Count == 0)
+        {
+            return new UnityEngine.Color(0, 0, 0, 1);
+        }
+        else
+        {
+            return colorGroups.OrderByDescending(colorGroup => colorGroup.Value).First().Key;
         }
 
         // Calculate average values for Blue, Green, and Red channels

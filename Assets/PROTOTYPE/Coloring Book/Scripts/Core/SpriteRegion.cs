@@ -6,6 +6,8 @@ public class SpriteRegion : MonoBehaviour
     private Sprite _highlightSprite;
     private Sprite _sprite;
 
+    private Color _colorGroup;
+
     public Sprite HighlightSprite
     {
         get => _highlightSprite;
@@ -18,8 +20,32 @@ public class SpriteRegion : MonoBehaviour
         set => _sprite = value;
     }
 
+    public Color ColorGroup
+    {
+        get => _colorGroup;
+        set => _colorGroup = value;
+    }
+
+    private void Awake()
+    {
+        SelectColorButton.selectColorGroupEvent += SelectColorButtonPressed;
+    }
+
+    private void OnDestroy()
+    {
+        SelectColorButton.selectColorGroupEvent -= SelectColorButtonPressed;
+    }
+
     public void FillColor()
     {
         SpriteRenderer.sprite = _sprite;
+    }
+
+    private void SelectColorButtonPressed(Color color)
+    {
+        if (color == _colorGroup)
+        {
+            FillColor();
+        }
     }
 }

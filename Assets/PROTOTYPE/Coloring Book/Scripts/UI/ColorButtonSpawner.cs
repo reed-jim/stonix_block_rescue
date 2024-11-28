@@ -26,6 +26,7 @@ public class ColorButtonSpawner : MonoBehaviour
         SelectColorButton selectColorButton = Instantiate(colorButtonPrefab, container);
 
         selectColorButton.ButtonImage.color = color;
+        selectColorButton.ColorGroup = color;
 
         _colorButtons.Add(selectColorButton);
 
