@@ -186,7 +186,6 @@ public class ImageSegmenter : MonoBehaviour
             newSegmentObject.transform.position = new Vector3(spriteSize.x * ((float)boundingBox.Location.X) / image.Width,
                 spriteSize.y * ((float)boundingBox.Location.Y - image.Height) / image.Height, 0);
 
-
             UnityEngine.Color color = GetMostCommonColorInContour(TextureToMat(segmentTexture), contours[i]);
 
             spriteRegion.ColorGroup = color;

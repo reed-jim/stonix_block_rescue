@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfe6b501b148ef042aaa835abee09b7b, type: 3}
   m_Name: Gallery Item Data 2
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 30439974f41364d43bc701cdd9d2956a, type: 3}
+  sprite: {fileID: 21300000, guid: 2fe6b4320f52ec34ab45fd838590d927, type: 3}
