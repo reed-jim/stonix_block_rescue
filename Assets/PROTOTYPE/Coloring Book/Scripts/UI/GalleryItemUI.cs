@@ -22,7 +22,7 @@ namespace Saferio.Prototype.ColoringBook
 
         public void Setup(GalleryItemData galleryItemData)
         {
-            image.sprite = galleryItemData.Sprite;
+            image.sprite = galleryItemData.OutlinedSprite;
 
             _galleryItemData = galleryItemData;
         }

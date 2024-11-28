@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Linq;
 using System;
+using Saferio.Prototype.ColoringBook;
 
 public class ImageSegmenter : MonoBehaviour
 {
@@ -28,15 +29,25 @@ public class ImageSegmenter : MonoBehaviour
 
     #region ACTION
     public static event Action<UnityEngine.Color> spawnColorButtonEvent;
-    #endregion  
+    #endregion      
 
     private void Awake()
     {
+        LevelController.spawnSegmentationSpriteEvent += SpawnSegmentationSprite;
+
         distinctDetectedColors = new List<UnityEngine.Color>();
     }
 
-    void Start()
+    private void OnDestroy()
     {
+        LevelController.spawnSegmentationSpriteEvent -= SpawnSegmentationSprite;
+    }
+
+    void SpawnSegmentationSprite(CurrentLevelData currentLevelData)
+    {
+        Debug.Log(currentLevelData.Sprite.name);
+        originalSpriteRenderer.sprite = currentLevelData.Sprite;
+
         texture = originalSpriteRenderer.sprite.texture;
 
         texture.GetPixels32();
@@ -149,6 +160,7 @@ public class ImageSegmenter : MonoBehaviour
             segmentTexture.Apply();
             segmentHighlightTexture.Apply();
 
+
             Sprite newSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
             Sprite segmentHighlightSprite = Sprite.Create(segmentHighlightTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
 
@@ -167,11 +179,43 @@ public class ImageSegmenter : MonoBehaviour
             newSegmentObject.transform.position = new Vector3(spriteSize.x * ((float)boundingBox.Location.X) / image.Width,
                 spriteSize.y * ((float)boundingBox.Location.Y - image.Height) / image.Height, 0);
 
-            UnityEngine.Color color = GetMostCommonColorInContour(TextureToMat(segmentTexture), contours[i]);
 
-            spriteRegion.ColorGroup = color;
 
-            spawnColorButtonEvent?.Invoke(color);
+            UnityEngine.Color contourDominantColor = GetMostCommonColorInContour(TextureToMat(segmentTexture), contours[i]);
+
+            bool isCloseColor = false;
+
+            if (distinctDetectedColors.Count == 0)
+            {
+                distinctDetectedColors.Add(contourDominantColor);
+            }
+            else
+            {
+                for (int j = 0; j < distinctDetectedColors.Count; j++)
+                {
+                    if (AreColorsClose(distinctDetectedColors[j], contourDominantColor))
+                    {
+                        spriteRegion.ColorGroup = distinctDetectedColors[j];
+
+                        isCloseColor = true;
+
+                        break;
+                    }
+                }
+            }
+
+            if (isCloseColor)
+            {
+                continue;
+            }
+            else
+            {
+                distinctDetectedColors.Add(contourDominantColor);
+            }
+
+            spriteRegion.ColorGroup = contourDominantColor;
+
+            spawnColorButtonEvent?.Invoke(contourDominantColor);
         }
     }
     #endregion
@@ -292,27 +336,21 @@ public class ImageSegmenter : MonoBehaviour
     #region GET DOMINANT COLOR FROM CONTOUR
     public static UnityEngine.Color GetMostCommonColorInContour(Mat image, VectorOfPoint contour)
     {
-        // Step 1: Create a mask for the contour
-        Mat mask = new Mat(image.Size, DepthType.Cv8U, 1);  // 1-channel mask
-        mask.SetTo(new MCvScalar(0));  // Initialize the mask to black (0)
-        CvInvoke.FillPoly(mask, new VectorOfVectorOfPoint(new VectorOfPoint[] { contour }), new MCvScalar(0)); // Set contour region to white (255)
+        Mat mask = new Mat(image.Size, DepthType.Cv8U, 1);
+        mask.SetTo(new MCvScalar(0));
+        CvInvoke.FillPoly(mask, new VectorOfVectorOfPoint(new VectorOfPoint[] { contour }), new MCvScalar(0));
 
-        // Step 2: Create a Mat for the ROI (Region of Interest) and extract the region
-        Mat roi = new Mat(image.Size, image.Depth, image.NumberOfChannels);  // Initialize roi with the same size and type as the source image
+        Mat roi = new Mat(image.Size, image.Depth, image.NumberOfChannels);
 
-        // Step 3: Copy the region of interest from the image using the mask
-        image.CopyTo(roi, mask);  // Copy the region from the image to roi where the mask is 255
+        image.CopyTo(roi, mask);
 
-        // Step 4: Get the raw data of the roi image (roiData) as byte[,,]
-        byte[,,] roiData = image.ToImage<Bgr, byte>().Data;  // Convert to BGR image and extract the byte[,,] data
+        byte[,,] roiData = image.ToImage<Bgr, byte>().Data;
 
-        // Step 5: Initialize variables to calculate the average color
         double sumBlue = 0, sumGreen = 0, sumRed = 0;
         int pixelCount = 0;
 
         Dictionary<UnityEngine.Color, int> colorGroups = new Dictionary<UnityEngine.Color, int>();
 
-        // Step 6: Iterate through the pixels in the ROI and calculate the sum of BGR channels
         for (int y = 0; y < roi.Height; y++)
         {
             for (int x = 0; x < roi.Width; x++)
@@ -370,22 +408,6 @@ public class ImageSegmenter : MonoBehaviour
                         }
                     }
                 }
-
-                // // Access the pixel's BGR components directly from the 3D byte array (roiData)
-                // byte blue = roiData[y, x, 0];     // Blue channel
-                // byte green = roiData[y, x, 1];    // Green channel
-                // byte red = roiData[y, x, 2];      // Red channel
-
-                // if (blue == 0 && green == 0 && red == 0)
-                // {
-                //     continue;
-                // }
-
-                // // Accumulate the color values
-                // sumBlue += blue;
-                // sumGreen += green;
-                // sumRed += red;
-                // pixelCount++;
             }
         }
 
@@ -395,21 +417,30 @@ public class ImageSegmenter : MonoBehaviour
         }
         else
         {
-            Debug.Log(colorGroups.OrderByDescending(colorGroup => colorGroup.Value).First().Key);
             return colorGroups.OrderByDescending(colorGroup => colorGroup.Value).First().Key;
         }
+    }
+    #endregion
 
-        // Calculate average values for Blue, Green, and Red channels
-        double avgBlue = sumBlue / pixelCount;
-        double avgGreen = sumGreen / pixelCount;
-        double avgRed = sumRed / pixelCount;
+    #region COLOR UTIL
+    private bool AreColorsClose(UnityEngine.Color firstColor, UnityEngine.Color secondColor)
+    {
+        float difference = 0;
 
-        // Step 8: Return the average color as Unity Color (normalize to [0, 1] range)
-        return new UnityEngine.Color(
-            (float)(avgRed / 255.0),  // Normalize to [0, 1]
-            (float)(avgGreen / 255.0),  // Normalize to [0, 1]
-            (float)(avgBlue / 255.0)    // Normalize to [0, 1]
-        );
+        difference += Mathf.Abs(secondColor.r - firstColor.r);
+        difference += Mathf.Abs(secondColor.g - firstColor.g);
+        difference += Mathf.Abs(secondColor.b - firstColor.b);
+
+        difference /= 3f;
+
+        if (difference < 0.2f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     #endregion
 }

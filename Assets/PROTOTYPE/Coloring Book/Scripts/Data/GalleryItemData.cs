@@ -6,11 +6,16 @@ namespace Saferio.Prototype.ColoringBook
     public class GalleryItemData : ScriptableObject
     {
         [SerializeField] private Sprite sprite;
-        
+        [SerializeField] private Sprite outlinedSprite;
 
         public Sprite Sprite
         {
             get => sprite;
+        }
+
+        public Sprite OutlinedSprite
+        {
+            get => outlinedSprite;
         }
     }
 }
