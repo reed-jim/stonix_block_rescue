@@ -370,7 +370,7 @@ public class ImageSegmenter : MonoBehaviour
         image.CopyTo(roi, mask);  // Copy the region from the image to roi where the mask is 255
 
         // Step 4: Get the raw data of the roi image (roiData) as byte[,,]
-        byte[,,] roiData = roi.ToImage<Bgra, byte>().Data;  // Convert to BGR image and extract the byte[,,] data
+        byte[,,] roiData = image.ToImage<Bgr, byte>().Data;  // Convert to BGR image and extract the byte[,,] data
 
         // Step 5: Initialize variables to calculate the average color
         double sumBlue = 0, sumGreen = 0, sumRed = 0;
@@ -392,7 +392,7 @@ public class ImageSegmenter : MonoBehaviour
                     continue;
                 }
 
-                UnityEngine.Color colorGroup = new UnityEngine.Color(blue / 255f, green / 255f, red / 255f);
+                UnityEngine.Color colorGroup = new UnityEngine.Color(red / 255f, green / 255f, blue / 255f);
 
                 if (colorGroups.Count == 0)
                 {
@@ -414,7 +414,7 @@ public class ImageSegmenter : MonoBehaviour
                         difference += Mathf.Abs((green / 255f) - cachedGreen);
                         difference += Mathf.Abs((red / 255f) - cachedRed);
 
-                        if (difference < 0.2f)
+                        if (difference / 3f < 0.2f)
                         {
                             colorGroups[colorGroupsKey]++;
 
@@ -461,6 +461,7 @@ public class ImageSegmenter : MonoBehaviour
         }
         else
         {
+            Debug.Log(colorGroups.OrderByDescending(colorGroup => colorGroup.Value).First().Key);
             return colorGroups.OrderByDescending(colorGroup => colorGroup.Value).First().Key;
         }
 

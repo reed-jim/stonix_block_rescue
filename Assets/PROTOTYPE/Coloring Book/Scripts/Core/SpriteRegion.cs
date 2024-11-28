@@ -6,7 +6,7 @@ public class SpriteRegion : MonoBehaviour
     private Sprite _highlightSprite;
     private Sprite _sprite;
 
-    private Color _colorGroup;
+    [SerializeField] private Color _colorGroup;
 
     public Sprite HighlightSprite
     {
