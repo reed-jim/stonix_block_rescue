@@ -7,6 +7,7 @@ namespace Saferio.Prototype.ColoringBook
     {
         [SerializeField] private Sprite sprite;
         [SerializeField] private Sprite outlinedSprite;
+        [SerializeField] private GameEnum.GalleryImageTag galleryImageTag;
 
         public Sprite Sprite
         {
