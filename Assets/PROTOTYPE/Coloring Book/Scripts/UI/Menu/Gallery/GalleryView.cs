@@ -15,10 +15,16 @@ public class GalleryView : MonoBehaviour
 
     [Header("CUSTOMIZE")]
     [SerializeField] private GalleryImageTag galleryImageTag;
+    [SerializeField] private bool isSelectedAtBegin;
 
     private void Awake()
     {
         GalleryImageTagUI.selectTagEvent += OnGalleryImageTagSelected;
+
+        if (isSelectedAtBegin)
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     private void OnDestroy()

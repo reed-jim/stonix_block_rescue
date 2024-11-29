@@ -7,17 +7,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using static Saferio.Prototype.ColoringBook.GameEnum;
 
-public class GalleryScreen : MonoBehaviour
+namespace Saferio.Prototype.ColoringBook
 {
-    [SerializeField] private ObjectPoolingScrollView galleryScrollView;
-
-    [Header("SCRIPTABLE OBJECT")]
-    [SerializeField] private GalleryItemDataContainer galleryItemDataContainer;
-
-    private GalleryItemUI[] _galleryItems;
-
-    private void Awake()
+    public class GalleryScreen : UIScreen
     {
+        [SerializeField] private ObjectPoolingScrollView galleryScrollView;
 
+        [Header("SCRIPTABLE OBJECT")]
+        [SerializeField] private GalleryItemDataContainer galleryItemDataContainer;
+
+        private GalleryItemUI[] _galleryItems;
     }
 }

@@ -13,5 +13,13 @@ namespace Saferio.Prototype.ColoringBook
             Animal,
             Flower
         }
+
+        public enum ScreenRoute
+        {
+            Gallery,
+            Collection,
+            Daily,
+            Progress
+        }
     }
 }
