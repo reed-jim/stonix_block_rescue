@@ -265,6 +265,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07a6da6f9c571274395d74d981f33a80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  container: {fileID: 9061103596087479591}
+  imageRT: {fileID: 8897075655128585080}
   image: {fileID: 4542148573440445509}
   playButton: {fileID: 8644182567241946888}
   currentLevelData: {fileID: 11400000, guid: f5ef25322408746489f69e626e7645ce, type: 2}
@@ -380,7 +382,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3985466914176409218
 RectTransform:
   m_ObjectHideFlags: 0

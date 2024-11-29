@@ -15,14 +15,6 @@ public class GalleryScreen : MonoBehaviour
 
     private void Awake()
     {
-        SaferioTween.DelayAsync(1f, onCompletedAction: () =>
-        {
-            _galleryItems = galleryScrollView.Items.Select(item => item.GetComponent<GalleryItemUI>()).ToArray();
-
-            for (int i = 0; i < _galleryItems.Length; i++)
-            {
-                _galleryItems[i].Setup(galleryItemDataContainer.Items[i]);
-            }
-        });
+        
     }
 }

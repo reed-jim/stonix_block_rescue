@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfe6b501b148ef042aaa835abee09b7b, type: 3}
+  m_Name: Gallery Item Data 6
+  m_EditorClassIdentifier: 
+  sprite: {fileID: 21300000, guid: e5441687989747741b1fba8fac65f2fd, type: 3}
+  outlinedSprite: {fileID: 21300000, guid: 449fa86c5e037874ba56ecb492e9756d, type: 3}
