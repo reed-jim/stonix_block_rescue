@@ -169,6 +169,10 @@ public class ImageSegmenter : MonoBehaviour
             Sprite segmentSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
             Sprite segmentHighlightSprite = Sprite.Create(segmentHighlightTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
 
+            segmentOutlinedTexture.name = $"Outline - {texture.name}";
+            segmentSprite.name = $"Filled - {texture.name}";
+            segmentHighlightSprite.name = $"Highlight - {texture.name}";
+
             GameObject newSegmentObject = Instantiate(spritePrefab, transform.position, Quaternion.identity);
 
             SpriteRegion spriteRegion = newSegmentObject.GetComponent<SpriteRegion>();
@@ -180,7 +184,7 @@ public class ImageSegmenter : MonoBehaviour
             newSegmentObject.transform.position = new Vector3(spriteSize.x * ((float)boundingBox.Location.X) / image.Width,
                 spriteSize.y * ((float)boundingBox.Location.Y - image.Height) / image.Height, 0);
 
-
+            newSegmentObject.transform.position -= new Vector3(0.5f * spriteSize.x, -0.5f * spriteSize.y);
 
 
 
@@ -201,6 +205,8 @@ public class ImageSegmenter : MonoBehaviour
                     {
                         spriteRegion.ColorGroup = distinctDetectedColors[j];
 
+                        addRegionColorButtonEvent?.Invoke(distinctDetectedColors[j]);
+
                         isCloseColor = true;
 
                         break;
@@ -210,8 +216,6 @@ public class ImageSegmenter : MonoBehaviour
 
             if (isCloseColor)
             {
-                addRegionColorButtonEvent?.Invoke(contourDominantColor);
-
                 continue;
             }
             else

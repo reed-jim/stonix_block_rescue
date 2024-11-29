@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfe6b501b148ef042aaa835abee09b7b, type: 3}
   m_Name: Gallery Item Data 1
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 30439974f41364d43bc701cdd9d2956a, type: 3}
-  outlinedSprite: {fileID: 21300000, guid: 2fe6b4320f52ec34ab45fd838590d927, type: 3}
+  sprite: {fileID: 21300000, guid: 241d0e5235db527419075239a7801f56, type: 3}
+  outlinedSprite: {fileID: 21300000, guid: 79b6a94f4bf1a85489b3f4644fbd2cf8, type: 3}

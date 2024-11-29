@@ -40,7 +40,7 @@ public class ColorButtonSpawner : MonoBehaviour
 
         for (int i = 0; i < _colorButtons.Count; i++)
         {
-            UIUtil.SetLocalPositionX(_colorButtons[i].RectTransform, -canvas.sizeDelta.x + i * 1.1f * buttonSize.x);
+            UIUtil.SetLocalPositionX(_colorButtons[i].RectTransform, -0.45f * canvas.sizeDelta.x + i * 1.2f * buttonSize.x);
         }
     }
 }

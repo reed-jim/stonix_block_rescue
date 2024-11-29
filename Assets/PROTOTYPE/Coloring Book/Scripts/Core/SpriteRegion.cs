@@ -71,6 +71,11 @@ public class SpriteRegion : MonoBehaviour
 
     public void FillColor()
     {
+        if (_isFilled)
+        {
+            return;
+        }
+
         spriteRenderer.sprite = _sprite;
 
         spriteRenderer.color = ColorUtil.WithAlpha(spriteRenderer.color, 0);
@@ -78,6 +83,8 @@ public class SpriteRegion : MonoBehaviour
         Tween.Alpha(spriteRenderer, 1, duration: 0.3f);
 
         fillSpriteRegionEvent?.Invoke(_colorGroup);
+
+        regionCollider.enabled = false;
 
         _isFilled = true;
     }
