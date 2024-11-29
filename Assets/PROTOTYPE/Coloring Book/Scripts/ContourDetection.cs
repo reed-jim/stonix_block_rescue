@@ -29,6 +29,7 @@ public class ImageSegmenter : MonoBehaviour
 
     #region ACTION
     public static event Action<UnityEngine.Color> spawnColorButtonEvent;
+    public static event Action<UnityEngine.Color> addRegionColorButtonEvent;
     #endregion      
 
     private void Awake()
@@ -45,7 +46,6 @@ public class ImageSegmenter : MonoBehaviour
 
     void SpawnSegmentationSprite(CurrentLevelData currentLevelData)
     {
-        Debug.Log(currentLevelData.Sprite.name);
         originalSpriteRenderer.sprite = currentLevelData.Sprite;
 
         texture = originalSpriteRenderer.sprite.texture;
@@ -120,6 +120,7 @@ public class ImageSegmenter : MonoBehaviour
             image.CopyTo(segment);
             image.ROI = System.Drawing.Rectangle.Empty;
 
+            Texture2D segmentOutlinedTexture = ImageToTexture(segment);
             Texture2D segmentTexture = ImageToTexture(segment);
             Texture2D segmentHighlightTexture = ImageToTexture(segment);
 
@@ -142,42 +143,45 @@ public class ImageSegmenter : MonoBehaviour
 
                         if (isInEdge)
                         {
+                            segmentOutlinedTexture.SetPixel(x, y, new UnityEngine.Color(0.9f, 0.9f, 0.9f, 1f));
                             segmentHighlightTexture.SetPixel(x, y, new UnityEngine.Color(0.9f, 0.9f, 0.9f, 1f));
                         }
                         else
                         {
-                            segmentHighlightTexture.SetPixel(x, y, new UnityEngine.Color(0.1f, 0.1f, 0.1f, 1f));
+                            segmentOutlinedTexture.SetPixel(x, y, new UnityEngine.Color(0.1f, 0.1f, 0.1f, 1f));
+                            segmentHighlightTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0.5f, 0f, 1f));
                         }
                     }
                     else
                     {
+                        segmentOutlinedTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0f, 0f, 0f));
                         segmentTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0f, 0f, 0f));
                         segmentHighlightTexture.SetPixel(x, y, new UnityEngine.Color(0f, 0f, 0f, 0f));
                     }
                 }
             }
 
+            segmentOutlinedTexture.Apply();
             segmentTexture.Apply();
             segmentHighlightTexture.Apply();
 
-
-            Sprite newSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
+            Sprite segmentOutlineSprite = Sprite.Create(segmentOutlinedTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
+            Sprite segmentSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
             Sprite segmentHighlightSprite = Sprite.Create(segmentHighlightTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
 
             GameObject newSegmentObject = Instantiate(spritePrefab, transform.position, Quaternion.identity);
-            newSegmentObject.GetComponent<SpriteRenderer>().sprite = segmentHighlightSprite;
 
             SpriteRegion spriteRegion = newSegmentObject.GetComponent<SpriteRegion>();
 
-            spriteRegion.HighlightSprite = segmentHighlightSprite;
-            spriteRegion.Sprite = newSprite;
-
-            newSegmentObject.AddComponent<BoxCollider2D>();
+            spriteRegion.Setup(segmentOutlineSprite, segmentSprite, segmentHighlightSprite);
 
             Vector2 spriteSize = originalSpriteRenderer.sprite.bounds.size;
 
             newSegmentObject.transform.position = new Vector3(spriteSize.x * ((float)boundingBox.Location.X) / image.Width,
                 spriteSize.y * ((float)boundingBox.Location.Y - image.Height) / image.Height, 0);
+
+
+
 
 
 
@@ -206,6 +210,8 @@ public class ImageSegmenter : MonoBehaviour
 
             if (isCloseColor)
             {
+                addRegionColorButtonEvent?.Invoke(contourDominantColor);
+
                 continue;
             }
             else
@@ -433,7 +439,7 @@ public class ImageSegmenter : MonoBehaviour
 
         difference /= 3f;
 
-        if (difference < 0.2f)
+        if (difference < 0.13f)
         {
             return true;
         }

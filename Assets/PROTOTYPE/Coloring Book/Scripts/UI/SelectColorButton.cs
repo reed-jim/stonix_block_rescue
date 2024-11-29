@@ -8,15 +8,13 @@ public class SelectColorButton : MonoBehaviour
     [SerializeField] private Button selectButton;
 
     [SerializeField] private Image buttonImage;
+    [SerializeField] private Image progress;
 
     private Color _colorGroup;
+    private int _numberOfRegions;
+    private int _numberOfFilledRegions;
 
     public static event Action<Color> selectColorGroupEvent;
-
-    private void Awake()
-    {
-        selectButton.onClick.AddListener(SelectColor);
-    }
 
     public RectTransform RectTransform
     {
@@ -36,8 +34,48 @@ public class SelectColorButton : MonoBehaviour
         set => _colorGroup = value;
     }
 
+    public int NumberOfRegions
+    {
+        get => _numberOfRegions;
+        set => _numberOfRegions = value;
+    }
+
+    private void Awake()
+    {
+        ImageSegmenter.addRegionColorButtonEvent += AddRegion;
+        SpriteRegion.fillSpriteRegionEvent += OnSpriteRegionFilled;
+
+        selectButton.onClick.AddListener(SelectColor);
+
+        progress.fillAmount = 0;
+    }
+
+    private void OnDestroy()
+    {
+        ImageSegmenter.addRegionColorButtonEvent -= AddRegion;
+        SpriteRegion.fillSpriteRegionEvent -= OnSpriteRegionFilled;
+    }
+
     private void SelectColor()
     {
         selectColorGroupEvent?.Invoke(_colorGroup);
+    }
+
+    private void AddRegion(Color color)
+    {
+        if (color == _colorGroup)
+        {
+            _numberOfRegions++;
+        }
+    }
+
+    private void OnSpriteRegionFilled(Color color)
+    {
+        if (color == _colorGroup)
+        {
+            _numberOfFilledRegions++;
+
+            progress.fillAmount = (float)_numberOfFilledRegions / _numberOfRegions;
+        }
     }
 }

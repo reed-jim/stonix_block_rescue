@@ -27,6 +27,7 @@ public class ColorButtonSpawner : MonoBehaviour
 
         selectColorButton.ButtonImage.color = color;
         selectColorButton.ColorGroup = color;
+        selectColorButton.NumberOfRegions = 1;
 
         _colorButtons.Add(selectColorButton);
 
