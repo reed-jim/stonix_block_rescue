@@ -15,6 +15,7 @@ namespace Saferio.Prototype.ColoringBook
 
         #region ACTION
         public static event Action<int> setSpriteSegmentFilledEvent;
+        public static event Action<Color> incrementNumberOfFilledSegmentOfColorGroupEvent;
         #endregion
 
         private void Awake()
@@ -67,6 +68,8 @@ namespace Saferio.Prototype.ColoringBook
                         int segmentIndex = i;
 
                         setSpriteSegmentFilledEvent?.Invoke(segmentIndex);
+
+                        incrementNumberOfFilledSegmentOfColorGroupEvent?.Invoke(ColorStringToColor(levelData.SpriteSegmentsData[i].ColorGroup));
                     }
                 }
             }

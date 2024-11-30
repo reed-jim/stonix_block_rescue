@@ -1,4 +1,5 @@
 using System;
+using Saferio.Prototype.ColoringBook;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,6 +45,7 @@ public class SelectColorButton : MonoBehaviour
     {
         ImageSegmenter.addRegionColorButtonEvent += AddRegion;
         SpriteRegion.fillSpriteRegionEvent += OnSpriteRegionFilled;
+        LevelDataManager.incrementNumberOfFilledSegmentOfColorGroupEvent += OnSpriteRegionFilled;
 
         selectButton.onClick.AddListener(SelectColor);
 
@@ -54,6 +56,7 @@ public class SelectColorButton : MonoBehaviour
     {
         ImageSegmenter.addRegionColorButtonEvent -= AddRegion;
         SpriteRegion.fillSpriteRegionEvent -= OnSpriteRegionFilled;
+        LevelDataManager.incrementNumberOfFilledSegmentOfColorGroupEvent -= OnSpriteRegionFilled;
     }
 
     private void SelectColor()
