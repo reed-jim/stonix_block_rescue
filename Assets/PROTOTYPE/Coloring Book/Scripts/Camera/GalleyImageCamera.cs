@@ -15,6 +15,7 @@ namespace Saferio.Prototype.ColoringBook
         private void Awake()
         {
             SwipeGesture.swipeGestureEvent += MoveCamera;
+            PinchGesture.pinchGestureEvent += ZoomCamera;
 
             FitTheGalleryImage();
         }
@@ -22,6 +23,7 @@ namespace Saferio.Prototype.ColoringBook
         private void OnDestroy()
         {
             SwipeGesture.swipeGestureEvent -= MoveCamera;
+            PinchGesture.pinchGestureEvent -= ZoomCamera;
         }
 
         private void FitTheGalleryImage()
@@ -32,6 +34,11 @@ namespace Saferio.Prototype.ColoringBook
         private void MoveCamera(Vector2 moveDirection)
         {
             imageCameraTransform.position -= cameraMoveSpeedMultiplier * (Vector3)moveDirection;
+        }
+
+        private void ZoomCamera(float zoomValue)
+        {
+            imageCamera.orthographicSize = zoomValue;
         }
     }
 }

@@ -15,7 +15,6 @@ public class SwipeGesture : MonoBehaviour
     public static event Action<Vector2> swipeGestureEvent;
     #endregion
 
-
     private void Update()
     {
         if (Input.GetMouseButton(0))
