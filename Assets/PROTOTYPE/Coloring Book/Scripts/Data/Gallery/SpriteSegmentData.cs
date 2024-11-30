@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class SpriteSegmentData
 {
-    private Color _colorGroup;
+    private string _colorGroup;
 
     private bool _isFilled;
 
-    public Color ColorGroup
+    public string ColorGroup
     {
         get => _colorGroup;
         set => _colorGroup = value;

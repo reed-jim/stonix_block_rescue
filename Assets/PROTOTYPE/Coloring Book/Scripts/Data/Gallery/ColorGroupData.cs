@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class ColorGroupData
 {
-    private Color _color;
+    private string _colorString;
     private int _numberOfRegions;
     private int _numberOfFilledRegions;
 
-    public Color Color
+    public string ColorString
     {
-        get => _color;
-        set => _color = value;
+        get => _colorString;
+        set => _colorString = value;
     }
 
     public int NumberOfRegions

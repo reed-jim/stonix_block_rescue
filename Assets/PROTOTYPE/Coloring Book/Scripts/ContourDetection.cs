@@ -182,6 +182,8 @@ public class ImageSegmenter : MonoBehaviour
 
             SpriteRegion spriteRegion = newSegmentObject.GetComponent<SpriteRegion>();
 
+            spriteRegion.SegmentIndex = spriteRegions.Count;
+
             spriteRegions.Add(spriteRegion);
 
             spriteRegion.Setup(segmentOutlineSprite, segmentSprite, segmentHighlightSprite);
@@ -241,7 +243,9 @@ public class ImageSegmenter : MonoBehaviour
 
         for (int i = 0; i < distinctDetectedColors.Count; i++)
         {
-            colorGroupsData[i].Color = distinctDetectedColors[i];
+            colorGroupsData[i] = new ColorGroupData();
+
+            colorGroupsData[i].ColorString = distinctDetectedColors[i].ToString();
             colorGroupsData[i].NumberOfRegions = numberSegmentOfDistinctColors[i];
         }
 

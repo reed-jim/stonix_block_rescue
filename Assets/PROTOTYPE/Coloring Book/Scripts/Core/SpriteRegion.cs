@@ -1,5 +1,6 @@
 using System;
 using PrimeTween;
+using Saferio.Prototype.ColoringBook;
 using Saferio.Util.SaferioTween;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ public class SpriteRegion : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private BoxCollider2D regionCollider;
 
+    private int _segmentIndex;
     private Sprite _outlinedSprite;
     private Sprite _sprite;
     private Sprite _highlightSprite;
@@ -20,7 +22,14 @@ public class SpriteRegion : MonoBehaviour
 
     #region ACTION
     public static event Action<Color> fillSpriteRegionEvent;
+    public static event Action<int> fillSpriteSegmentEvent;
     #endregion
+
+    public int SegmentIndex
+    {
+        get => _segmentIndex;
+        set => _segmentIndex = value;
+    }
 
     public Sprite OutlinedSprite
     {
@@ -55,11 +64,13 @@ public class SpriteRegion : MonoBehaviour
     private void Awake()
     {
         SelectColorButton.selectColorGroupEvent += SelectColorButtonPressed;
+        LevelDataManager.setSpriteSegmentFilledEvent += FillColor;
     }
 
     private void OnDestroy()
     {
         SelectColorButton.selectColorGroupEvent -= SelectColorButtonPressed;
+        LevelDataManager.setSpriteSegmentFilledEvent -= FillColor;
     }
 
     public void Setup(Sprite outlinedSprite, Sprite filledSprite, Sprite highlightSprite)
@@ -89,10 +100,19 @@ public class SpriteRegion : MonoBehaviour
         Tween.Alpha(spriteRenderer, 1, duration: 0.3f);
 
         fillSpriteRegionEvent?.Invoke(_colorGroup);
+        fillSpriteSegmentEvent?.Invoke(_segmentIndex);
 
         regionCollider.enabled = false;
 
         _isFilled = true;
+    }
+
+    public void FillColor(int segmentIndex)
+    {
+        if (segmentIndex == _segmentIndex)
+        {
+            FillColor();
+        }
     }
 
     private void SelectColorButtonPressed(Color color)

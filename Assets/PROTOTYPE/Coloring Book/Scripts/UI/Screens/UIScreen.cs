@@ -45,8 +45,6 @@ namespace Saferio.Prototype.ColoringBook
             SwitchRouteButton.switchRouteEvent += OnRouteSwitched;
 
             _transitionAnimation = GetComponent<ISaferioUIAnimation>();
-
-            Debug.Log(_transitionAnimation);
         }
 
         private void OnDestroy()
