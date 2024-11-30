@@ -22,6 +22,7 @@ public class ImageSegmenter : MonoBehaviour
     [SerializeField] float minContourArea = 100.0f;
 
     [SerializeField] private List<UnityEngine.Color> distinctDetectedColors;
+    [SerializeField] private List<int> numberSegmentOfDistinctColors;
 
     #region PRIVATE FIELD
     private Texture2D texture;
@@ -30,6 +31,7 @@ public class ImageSegmenter : MonoBehaviour
     #region ACTION
     public static event Action<UnityEngine.Color> spawnColorButtonEvent;
     public static event Action<UnityEngine.Color> addRegionColorButtonEvent;
+    public static event Action<List<SpriteRegion>, ColorGroupData[]> saveSpriteRegionsEvent;
     #endregion      
 
     private void Awake()
@@ -37,6 +39,7 @@ public class ImageSegmenter : MonoBehaviour
         LevelController.spawnSegmentationSpriteEvent += SpawnSegmentationSprite;
 
         distinctDetectedColors = new List<UnityEngine.Color>();
+        numberSegmentOfDistinctColors = new List<int>();
     }
 
     private void OnDestroy()
@@ -104,6 +107,8 @@ public class ImageSegmenter : MonoBehaviour
 
     private void DrawImageSegments(Image<Bgr, byte> image, VectorOfVectorOfPoint contours)
     {
+        List<SpriteRegion> spriteRegions = new List<SpriteRegion>();
+
         for (int i = 0; i < contours.Size; i++)
         {
             double contourArea = CvInvoke.ContourArea(contours[i]);
@@ -177,6 +182,8 @@ public class ImageSegmenter : MonoBehaviour
 
             SpriteRegion spriteRegion = newSegmentObject.GetComponent<SpriteRegion>();
 
+            spriteRegions.Add(spriteRegion);
+
             spriteRegion.Setup(segmentOutlineSprite, segmentSprite, segmentHighlightSprite);
 
             Vector2 spriteSize = originalSpriteRenderer.sprite.bounds.size;
@@ -186,9 +193,6 @@ public class ImageSegmenter : MonoBehaviour
 
             newSegmentObject.transform.position -= new Vector3(0.5f * spriteSize.x, -0.5f * spriteSize.y);
 
-
-
-
             UnityEngine.Color contourDominantColor = GetMostCommonColorInContour(TextureToMat(segmentTexture), contours[i]);
 
             bool isCloseColor = false;
@@ -196,6 +200,7 @@ public class ImageSegmenter : MonoBehaviour
             if (distinctDetectedColors.Count == 0)
             {
                 distinctDetectedColors.Add(contourDominantColor);
+                numberSegmentOfDistinctColors.Add(1);
             }
             else
             {
@@ -204,6 +209,8 @@ public class ImageSegmenter : MonoBehaviour
                     if (AreColorsClose(distinctDetectedColors[j], contourDominantColor))
                     {
                         spriteRegion.ColorGroup = distinctDetectedColors[j];
+
+                        numberSegmentOfDistinctColors[j]++;
 
                         addRegionColorButtonEvent?.Invoke(distinctDetectedColors[j]);
 
@@ -221,12 +228,24 @@ public class ImageSegmenter : MonoBehaviour
             else
             {
                 distinctDetectedColors.Add(contourDominantColor);
+
+                numberSegmentOfDistinctColors.Add(1);
             }
 
             spriteRegion.ColorGroup = contourDominantColor;
 
             spawnColorButtonEvent?.Invoke(contourDominantColor);
         }
+
+        ColorGroupData[] colorGroupsData = new ColorGroupData[distinctDetectedColors.Count];
+
+        for (int i = 0; i < distinctDetectedColors.Count; i++)
+        {
+            colorGroupsData[i].Color = distinctDetectedColors[i];
+            colorGroupsData[i].NumberOfRegions = numberSegmentOfDistinctColors[i];
+        }
+
+        saveSpriteRegionsEvent?.Invoke(spriteRegions, colorGroupsData);
     }
     #endregion
 

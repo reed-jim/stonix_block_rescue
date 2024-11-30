@@ -59,20 +59,20 @@ namespace Saferio.Prototype.ColoringBook
 
         private void HandleEnterRoute()
         {
-            SaferioTween.LocalPositionAsync(iconRT, _iconInitialPosition + new Vector3(0, 0.2f * iconRT.sizeDelta.y), duration: 0.3f);
-            // SaferioTween.ScaleAsync(iconRT, 1.3f * iconRT.localScale, duration: 0.3f);
+            SaferioTween.LocalPositionAsync(iconRT, _iconInitialPosition + new Vector3(0, 0.2f * iconRT.sizeDelta.y), duration: 0.2f);
+            // SaferioTween.ScaleAsync(iconRT, 1.3f * iconRT.localScale, duration: 0.2f);
 
-            Tween.Color(icon, Color.red, duration: 0.3f);
-            Tween.Color(text, Color.red, duration: 0.3f);
+            Tween.Color(icon, Color.red, duration: 0.2f);
+            Tween.Color(text, Color.red, duration: 0.2f);
         }
 
         private void HandleExitRoute()
         {
-            SaferioTween.LocalPositionAsync(iconRT, _iconInitialPosition, duration: 0.3f);
-            // SaferioTween.ScaleAsync(iconRT, Vector3.one, duration: 0.3f);
+            SaferioTween.LocalPositionAsync(iconRT, _iconInitialPosition, duration: 0.2f);
+            // SaferioTween.ScaleAsync(iconRT, Vector3.one, duration: 0.2f);
 
-            Tween.Color(icon, Color.white, duration: 0.3f);
-            Tween.Color(text, Color.white, duration: 0.3f);
+            Tween.Color(icon, Color.white, duration: 0.2f);
+            Tween.Color(text, Color.white, duration: 0.2f);
         }
     }
 }

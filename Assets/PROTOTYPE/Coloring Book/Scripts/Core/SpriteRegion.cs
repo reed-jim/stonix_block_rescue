@@ -46,6 +46,12 @@ public class SpriteRegion : MonoBehaviour
         set => _colorGroup = value;
     }
 
+    public bool IsFilled
+    {
+        get => _isFilled;
+        set => _isFilled = value;
+    }
+
     private void Awake()
     {
         SelectColorButton.selectColorGroupEvent += SelectColorButtonPressed;
