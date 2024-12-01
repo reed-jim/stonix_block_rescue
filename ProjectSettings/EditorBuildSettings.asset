@@ -27,5 +27,6 @@ EditorBuildSettings:
     path: Assets/PROTOTYPE/Coloring Book/Scenes/Coloring Book - Gameplay.unity
     guid: 4c54a4a65e6b93f4a855385da14d10bd
   m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: 0a2fea30d393f434c92748e8745aae34, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

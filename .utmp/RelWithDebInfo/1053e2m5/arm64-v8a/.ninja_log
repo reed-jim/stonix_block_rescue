@@ -1,10 +1,19 @@
 # ninja log v5
 8	3176	7542505712450034	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	24655ef9106c3dda
 10	3180	7542505713233121	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	cdfbc80a0b13cd1b
-5	3305	7542505713532314	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5440b12afb6ad8d5
-11	3425	7542505715487112	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1678e5acf2d08a4d
 13	3435	7542505715606784	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e4fd44d7a88c7bf9
+5	3305	7542505713532314	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5440b12afb6ad8d5
 0	3638	7542505717682063	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	faaebac023810368
+11	3425	7542505715487112	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1678e5acf2d08a4d
+4190	4322	7542505724668704	D:/Projects/Stonix Block Rescue/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/1053e2m5/obj/arm64-v8a/libgame.so	9b1134b3a05114b3
 7	4120	7542505722525021	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	6e85b36ef057de25
 3	4190	7542505723388319	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	5b1ac2073069ec6b
-4190	4322	7542505724668704	D:/Projects/Stonix Block Rescue/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/1053e2m5/obj/arm64-v8a/libgame.so	9b1134b3a05114b3
+7	2332	7546973248372469	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	24655ef9106c3dda
+11	2522	7546973250563273	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	cdfbc80a0b13cd1b
+4	2714	7546973252833645	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5440b12afb6ad8d5
+14	2727	7546973252909301	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1678e5acf2d08a4d
+15	2748	7546973253140958	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e4fd44d7a88c7bf9
+10	2767	7546973253337366	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	faaebac023810368
+13	3108	7546973256890534	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	6e85b36ef057de25
+8	3223	7546973258023092	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	5b1ac2073069ec6b
+3224	3363	7546973259399101	D:/Projects/Stonix Block Rescue/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/1053e2m5/obj/arm64-v8a/libgame.so	9b1134b3a05114b3

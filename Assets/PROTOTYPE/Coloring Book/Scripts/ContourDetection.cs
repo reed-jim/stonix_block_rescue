@@ -9,9 +9,13 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using System;
 using Saferio.Prototype.ColoringBook;
+using System.Threading.Tasks;
+using UnityEditor;
+using System.IO;
 
 public class ImageSegmenter : MonoBehaviour
 {
+    [SerializeField] private Transform segmentContainer;
     public SpriteRenderer originalSpriteRenderer;
     public GameObject spritePrefab;
 
@@ -50,6 +54,17 @@ public class ImageSegmenter : MonoBehaviour
     void SpawnSegmentationSprite(CurrentLevelData currentLevelData)
     {
         originalSpriteRenderer.sprite = currentLevelData.Sprite;
+
+        texture = originalSpriteRenderer.sprite.texture;
+
+        texture.GetPixels32();
+
+        ProcessImageAndSegment();
+    }
+
+    public void ProcessImageAndSegment(Sprite originalSprite)
+    {
+        originalSpriteRenderer.sprite = originalSprite;
 
         texture = originalSpriteRenderer.sprite.texture;
 
@@ -174,11 +189,15 @@ public class ImageSegmenter : MonoBehaviour
             Sprite segmentSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
             Sprite segmentHighlightSprite = Sprite.Create(segmentHighlightTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
 
-            segmentOutlinedTexture.name = $"Outline - {texture.name}";
-            segmentSprite.name = $"Filled - {texture.name}";
-            segmentHighlightSprite.name = $"Highlight - {texture.name}";
+            segmentOutlinedTexture.name = $"Outline - {texture.name} {i}";
+            segmentSprite.name = $"Filled - {texture.name} {i}";
+            segmentHighlightSprite.name = $"Highlight - {texture.name} {i}";
 
-            GameObject newSegmentObject = Instantiate(spritePrefab, transform.position, Quaternion.identity);
+            SaveSpriteToFile(segmentOutlineSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Outlined", segmentOutlinedTexture.name);
+            // SaveSprite(segmentSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Outlined", segmentSprite.name);
+            // SaveSprite(segmentHighlightSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Outlined", segmentHighlightSprite.name);
+
+            GameObject newSegmentObject = Instantiate(spritePrefab, segmentContainer);
 
             SpriteRegion spriteRegion = newSegmentObject.GetComponent<SpriteRegion>();
 
@@ -259,25 +278,22 @@ public class ImageSegmenter : MonoBehaviour
         int width = texture.width;
         int height = texture.height;
 
-        // Create a byte array for the pixel data
-        byte[] imageBytes = new byte[width * height * 3]; // 3 bytes per pixel (BGR)
+        byte[] imageBytes = new byte[width * height * 3];
 
         int index = 0;
-        // Loop through all pixels and fill the byte array with BGR data
+
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
                 UnityEngine.Color color = texture.GetPixel(x, y);
 
-                // Convert Unity's Color (r, g, b, a) to BGR
-                imageBytes[index++] = (byte)(color.b * 255); // Blue
-                imageBytes[index++] = (byte)(color.g * 255); // Green
-                imageBytes[index++] = (byte)(color.r * 255); // Red
+                imageBytes[index++] = (byte)(color.b * 255);
+                imageBytes[index++] = (byte)(color.g * 255);
+                imageBytes[index++] = (byte)(color.r * 255);
             }
         }
 
-        // Create EmguCV Image from the byte array (BGR format)
         Image<Bgr, byte> image = new Image<Bgr, byte>(width, height);
         image.Bytes = imageBytes;
 
@@ -286,26 +302,20 @@ public class ImageSegmenter : MonoBehaviour
 
     private Texture2D ImageToTexture(Image<Gray, byte> grayImage)
     {
-        // Create a new Texture2D with the same width and height as the Emgu CV image
         Texture2D texture = new Texture2D(grayImage.Width, grayImage.Height);
 
-        // Loop through each pixel and convert the grayscale value to a Unity Color
         for (int y = 0; y < grayImage.Height; y++)
         {
             for (int x = 0; x < grayImage.Width; x++)
             {
-                // Get the grayscale pixel value (0 to 255)
                 byte pixelValue = grayImage.Data[y, x, 0];
 
-                // Convert the pixel value to a Unity Color (grayscale value as R, G, B)
                 UnityEngine.Color color = new UnityEngine.Color(pixelValue / 255f, pixelValue / 255f, pixelValue / 255f);
 
-                // Set the pixel on the Texture2D
                 texture.SetPixel(x, y, color);
             }
         }
 
-        // Apply the changes to the texture
         texture.Apply();
 
         return texture;
@@ -474,6 +484,75 @@ public class ImageSegmenter : MonoBehaviour
         {
             return false;
         }
+    }
+    #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #region SAVE/LOAD
+    private void SaveSprite(Sprite sprite, string folderPath, string spriteName)
+    {
+        if (sprite == null)
+        {
+            EditorUtility.DisplayDialog("Error", "Please assign a sprite to save.", "OK");
+            return;
+        }
+
+        string spritePath = $"{folderPath}/{spriteName}.png";
+
+        AssetDatabase.CreateAsset(sprite, spritePath);
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+    }
+
+    public async void SaveSpriteToFile(Sprite sprite, string savePath, string spriteName)
+    {
+        if (!Directory.Exists(savePath))
+        {
+            Directory.CreateDirectory(savePath);
+        }
+
+        Texture2D texture = SpriteToTexture2D(sprite);
+
+        byte[] pngBytes = texture.EncodeToPNG();
+        string filePath = Path.Combine(savePath, $"{spriteName}.png");
+
+        await File.WriteAllBytesAsync(filePath, pngBytes);
+
+        TextureImporter textureImporter = AssetImporter.GetAtPath(savePath) as TextureImporter;
+
+        if (textureImporter != null)
+        {
+            textureImporter.textureType = TextureImporterType.Sprite;
+            textureImporter.spriteImportMode = SpriteImportMode.Single;
+
+            AssetDatabase.ImportAsset(savePath, ImportAssetOptions.ForceUpdate);
+        }
+    }
+
+    private Texture2D SpriteToTexture2D(Sprite sprite)
+    {
+        Texture2D texture = new Texture2D((int)sprite.rect.width, (int)sprite.rect.height);
+        texture.SetPixels(sprite.texture.GetPixels(
+            (int)sprite.textureRect.x,
+            (int)sprite.textureRect.y,
+            (int)sprite.textureRect.width,
+            (int)sprite.textureRect.height));
+        texture.Apply();
+        return texture;
     }
     #endregion
 }

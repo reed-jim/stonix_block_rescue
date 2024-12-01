@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.IO;
 using Saferio.Prototype.ColoringBook;
 using UnityEditor;
@@ -77,3 +78,4 @@ public class ImageSegmentationTool : EditorWindow
         return texture;
     }
 }
+#endif
