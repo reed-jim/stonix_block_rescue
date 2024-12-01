@@ -11,8 +11,8 @@ public class SelectColorButton : MonoBehaviour
     [SerializeField] private Image buttonImage;
     [SerializeField] private Image progress;
 
-    private Color _colorGroup;
-    private int _numberOfRegions;
+    [SerializeField] private Color _colorGroup;
+    [SerializeField] private int _numberOfRegions;
     private int _numberOfFilledRegions;
 
     public static event Action<Color> selectColorGroupEvent;

@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 5653484820215687705}
   regionCollider: {fileID: 2440284634199998530}
+  currentLevelData: {fileID: 11400000, guid: f5ef25322408746489f69e626e7645ce, type: 2}
   _colorGroup: {r: 0, g: 0, b: 0, a: 0}
 --- !u!212 &5653484820215687705
 SpriteRenderer:

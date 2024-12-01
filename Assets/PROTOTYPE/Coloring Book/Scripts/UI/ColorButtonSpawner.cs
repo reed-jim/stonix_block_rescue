@@ -21,6 +21,33 @@ public class ColorButtonSpawner : MonoBehaviour
         ImageSegmenter.spawnColorButtonEvent -= SpawnColorButton;
     }
 
+    public void SpawnColorButtons(SpriteRegion[] spriteRegions)
+    {
+        _colorButtons = new List<SelectColorButton>();
+        
+        for (int i = 0; i < spriteRegions.Length; i++)
+        {
+            bool isColorGroupExist = false;
+
+            for (int j = 0; j < _colorButtons.Count; j++)
+            {
+                if (_colorButtons[j].ColorGroup == spriteRegions[i].ColorGroup)
+                {
+                    _colorButtons[j].NumberOfRegions++;
+
+                    isColorGroupExist = true;
+
+                    break;
+                }
+            }
+
+            if (!isColorGroupExist)
+            {
+                SpawnColorButton(spriteRegions[i].ColorGroup);
+            }
+        }
+    }
+
     private void SpawnColorButton(Color color)
     {
         SelectColorButton selectColorButton = Instantiate(colorButtonPrefab, container);

@@ -34,6 +34,16 @@ namespace Saferio.Prototype.ColoringBook
             {
                 GenerateLevel();
             }
+
+            if (GUILayout.Button("Save"))
+            {
+                SaveLevel();
+            }
+
+            if (GUILayout.Button("Test"))
+            {
+                Test();
+            }
         }
 
         private void GenerateLevel()
@@ -42,13 +52,27 @@ namespace Saferio.Prototype.ColoringBook
 
             _imageSegmenter.ProcessImageAndSegment(_targetSprite);
 
-            PrefabUtility.SavePrefabAsset(level);
+            PrefabUtility.SaveAsPrefabAsset(level, _savePath);
 
-            AssetDatabase.SaveAssets();
-            EditorUtility.FocusProjectWindow();
-            AssetDatabase.Refresh();
+            EditorUtility.SetDirty(level);
 
-            EditorUtility.DisplayDialog("Prefab Created", $"Prefab created at {_savePath}", "OK");
+            // AssetDatabase.SaveAssets();
+            // EditorUtility.FocusProjectWindow();
+            // AssetDatabase.Refresh();
+        }
+
+        private void SaveLevel()
+        {
+            GameObject level = AssetDatabase.LoadAssetAtPath<GameObject>(_savePath);
+
+            PrefabUtility.SaveAsPrefabAsset(level, _savePath);
+        }
+
+        private void Test()
+        {
+            TextureImporter textureImporter = AssetImporter.GetAtPath(_savePath) as TextureImporter;
+
+            Debug.Log(textureImporter);
         }
     }
 }

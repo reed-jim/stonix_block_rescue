@@ -12,12 +12,15 @@ using Saferio.Prototype.ColoringBook;
 using System.Threading.Tasks;
 using UnityEditor;
 using System.IO;
+using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.AddressableAssets;
 
 public class ImageSegmenter : MonoBehaviour
 {
     [SerializeField] private Transform segmentContainer;
     public SpriteRenderer originalSpriteRenderer;
     public GameObject spritePrefab;
+    [SerializeField] private ColorButtonSpawner colorButtonSpawner;
 
     [Header("CUSTOMIZE")]
     [SerializeField] private double thresh;
@@ -124,6 +127,8 @@ public class ImageSegmenter : MonoBehaviour
     {
         List<SpriteRegion> spriteRegions = new List<SpriteRegion>();
 
+        int segmentIndex = 0;
+
         for (int i = 0; i < contours.Size; i++)
         {
             double contourArea = CvInvoke.ContourArea(contours[i]);
@@ -189,13 +194,17 @@ public class ImageSegmenter : MonoBehaviour
             Sprite segmentSprite = Sprite.Create(segmentTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
             Sprite segmentHighlightSprite = Sprite.Create(segmentHighlightTexture, new Rect(0, 0, segmentTexture.width, segmentTexture.height), Vector2.zero);
 
-            segmentOutlinedTexture.name = $"Outline - {texture.name} {i}";
-            segmentSprite.name = $"Filled - {texture.name} {i}";
-            segmentHighlightSprite.name = $"Highlight - {texture.name} {i}";
+            segmentOutlinedTexture.name = $"Outline - {texture.name} {segmentIndex}";
+            segmentSprite.name = $"Filled - {texture.name} {segmentIndex}";
+            segmentHighlightSprite.name = $"Highlight - {texture.name} {segmentIndex}";
 
+#if UNITY_EDITOR
             SaveSpriteToFile(segmentOutlineSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Outlined", segmentOutlinedTexture.name);
-            // SaveSprite(segmentSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Outlined", segmentSprite.name);
-            // SaveSprite(segmentHighlightSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Outlined", segmentHighlightSprite.name);
+            SaveSpriteToFile(segmentSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Filled", segmentSprite.name);
+            SaveSpriteToFile(segmentHighlightSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Highlight", segmentHighlightSprite.name);
+#endif
+
+            segmentIndex++;
 
             GameObject newSegmentObject = Instantiate(spritePrefab, segmentContainer);
 
@@ -267,6 +276,8 @@ public class ImageSegmenter : MonoBehaviour
             colorGroupsData[i].ColorString = distinctDetectedColors[i].ToString();
             colorGroupsData[i].NumberOfRegions = numberSegmentOfDistinctColors[i];
         }
+
+        colorButtonSpawner.SpawnColorButtons(spriteRegions.ToArray());
 
         saveSpriteRegionsEvent?.Invoke(spriteRegions, colorGroupsData);
     }
@@ -476,7 +487,7 @@ public class ImageSegmenter : MonoBehaviour
 
         difference /= 3f;
 
-        if (difference < 0.13f)
+        if (difference < 0.15f)
         {
             return true;
         }
@@ -498,49 +509,53 @@ public class ImageSegmenter : MonoBehaviour
 
 
 
-
+#if UNITY_EDITOR
 
     #region SAVE/LOAD
-    private void SaveSprite(Sprite sprite, string folderPath, string spriteName)
+    public async void SaveSpriteToFile(Sprite sprite, string folderPath, string spriteName)
     {
-        if (sprite == null)
+        if (!Directory.Exists(folderPath))
         {
-            EditorUtility.DisplayDialog("Error", "Please assign a sprite to save.", "OK");
-            return;
-        }
-
-        string spritePath = $"{folderPath}/{spriteName}.png";
-
-        AssetDatabase.CreateAsset(sprite, spritePath);
-
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-
-    }
-
-    public async void SaveSpriteToFile(Sprite sprite, string savePath, string spriteName)
-    {
-        if (!Directory.Exists(savePath))
-        {
-            Directory.CreateDirectory(savePath);
+            Directory.CreateDirectory(folderPath);
         }
 
         Texture2D texture = SpriteToTexture2D(sprite);
 
         byte[] pngBytes = texture.EncodeToPNG();
-        string filePath = Path.Combine(savePath, $"{spriteName}.png");
+        string filePath = $"{folderPath}/{spriteName}.png";
 
-        await File.WriteAllBytesAsync(filePath, pngBytes);
+        if (!File.Exists(filePath))
+        {
+            await File.WriteAllBytesAsync(filePath, pngBytes);
+        }
 
-        TextureImporter textureImporter = AssetImporter.GetAtPath(savePath) as TextureImporter;
+        Debug.Log(filePath);
+        Debug.Log(AssetImporter.GetAtPath(filePath));
+
+        TextureImporter textureImporter = AssetImporter.GetAtPath(filePath) as TextureImporter;
 
         if (textureImporter != null)
         {
             textureImporter.textureType = TextureImporterType.Sprite;
             textureImporter.spriteImportMode = SpriteImportMode.Single;
 
-            AssetDatabase.ImportAsset(savePath, ImportAssetOptions.ForceUpdate);
+            AssetDatabase.ImportAsset(filePath, ImportAssetOptions.ForceUpdate);
         }
+
+        // ADDRESSABLE
+        AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+
+        AddressableAssetEntry entry = settings.FindAssetEntry(AssetDatabase.AssetPathToGUID(filePath));
+
+        if (entry == null)
+        {
+            entry = settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(filePath), settings.DefaultGroup);
+        }
+
+        entry.address = spriteName;
+
+        EditorUtility.SetDirty(settings);
+        AssetDatabase.SaveAssets();
     }
 
     private Texture2D SpriteToTexture2D(Sprite sprite)
@@ -555,4 +570,5 @@ public class ImageSegmenter : MonoBehaviour
         return texture;
     }
     #endregion
+#endif
 }
