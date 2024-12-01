@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Saferio.Prototype.ColoringBook;
+using Saferio.Util.SaferioTween;
 using UnityEngine;
 
 namespace Saferio.Prototype.ColoringBook
@@ -11,6 +12,8 @@ namespace Saferio.Prototype.ColoringBook
 
         #region PRIVATE FIELD
         private LevelData _levelData;
+        private List<SpriteRegion> _spriteRegions;
+        private List<ColorGroupData> _colorGroupsData;
         #endregion
 
         #region ACTION
@@ -20,14 +23,24 @@ namespace Saferio.Prototype.ColoringBook
 
         private void Awake()
         {
-            ImageSegmenter.saveSpriteRegionsEvent += SaveSpriteSegmentsData;
             SpriteRegion.fillSpriteSegmentEvent += OnSpriteSegmentFilled;
+            SpriteRegion.getSpriteRegionEvent += GetSpriteRegion;
+            SelectColorButton.getColorGroupDataEvent += GetColorGroupData;
+
+            _spriteRegions = new List<SpriteRegion>();
+            _colorGroupsData = new List<ColorGroupData>();
+
+            SaferioTween.DelayAsync(8f, onCompletedAction: () =>
+            {
+                SaveSpriteSegmentsData(_spriteRegions, _colorGroupsData.ToArray());
+            });
         }
 
         private void OnDestroy()
         {
-            ImageSegmenter.saveSpriteRegionsEvent -= SaveSpriteSegmentsData;
             SpriteRegion.fillSpriteSegmentEvent -= OnSpriteSegmentFilled;
+            SpriteRegion.getSpriteRegionEvent -= GetSpriteRegion;
+            SelectColorButton.getColorGroupDataEvent -= GetColorGroupData;
         }
 
         private void OnApplicationQuit()
@@ -90,6 +103,16 @@ namespace Saferio.Prototype.ColoringBook
         private void SaveLevelData()
         {
             DataUtility.Save(GameConstant.SAVE_FILE_NAME, $"Level_{currentLevelData.Level}_Data", _levelData);
+        }
+
+        private void GetSpriteRegion(SpriteRegion spriteRegion)
+        {
+            _spriteRegions.Add(spriteRegion);
+        }
+
+        private void GetColorGroupData(ColorGroupData colorGroupData)
+        {
+            _colorGroupsData.Add(colorGroupData);
         }
 
         private Color ColorStringToColor(string colorString)

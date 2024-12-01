@@ -205,6 +205,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 30439974f41364d43bc701cdd9d2956a
+    m_Address: watermelon
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3135eba15040b8d45b7f247a7eeaf810
     m_Address: Highlight - watermelon-4580910_640 14
     m_ReadOnly: 0
@@ -1042,6 +1047,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f5295dce6366f3c459e08bab0f1690f1
     m_Address: Outline - watermelon-4580910_640 70
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5ef25322408746489f69e626e7645ce
+    m_Address: Assets/PROTOTYPE/Coloring Book/Scriptable Objects/Current Level Data.asset
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

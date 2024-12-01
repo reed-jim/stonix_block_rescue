@@ -29,6 +29,7 @@ public class SpriteRegion : MonoBehaviour
     #region ACTION
     public static event Action<Color> fillSpriteRegionEvent;
     public static event Action<int> fillSpriteSegmentEvent;
+    public static event Action<SpriteRegion> getSpriteRegionEvent;
     #endregion
 
     public int SegmentIndex
@@ -83,15 +84,24 @@ public class SpriteRegion : MonoBehaviour
 
     private async void LoadSprite()
     {
-        _outlinedSprite = await LoadSpriteFromAddressableAsync($"Outline - {currentLevelData.Sprite.texture.name} {transform.GetSiblingIndex()}");
-        _sprite = await LoadSpriteFromAddressableAsync($"Filled - {currentLevelData.Sprite.texture.name} {transform.GetSiblingIndex()}");
-        _highlightSprite = await LoadSpriteFromAddressableAsync($"Highlight - {currentLevelData.Sprite.texture.name} {transform.GetSiblingIndex()}");
+        if (currentLevelData.Sprite == null)
+        {
+            currentLevelData.Sprite = await LoadSpriteFromAddressableAsync("watermelon");
+        }
+
+        _segmentIndex = transform.GetSiblingIndex();
+
+        _outlinedSprite = await LoadSpriteFromAddressableAsync($"Outline - {currentLevelData.Sprite.texture.name} {_segmentIndex}");
+        _sprite = await LoadSpriteFromAddressableAsync($"Filled - {currentLevelData.Sprite.texture.name} {_segmentIndex}");
+        _highlightSprite = await LoadSpriteFromAddressableAsync($"Highlight - {currentLevelData.Sprite.texture.name} {_segmentIndex}");
 
         spriteRenderer.sprite = _outlinedSprite;
 
         UpdateCollider();
 
         regionCollider.enabled = false;
+
+        getSpriteRegionEvent?.Invoke(this);
     }
 
     private async Task<Sprite> LoadSpriteFromAddressableAsync(string address)

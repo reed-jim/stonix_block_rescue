@@ -12,8 +12,10 @@ using Saferio.Prototype.ColoringBook;
 using System.Threading.Tasks;
 using UnityEditor;
 using System.IO;
+#if UNITY_EDITOR
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets;
+#endif
 
 public class ImageSegmenter : MonoBehaviour
 {
@@ -528,9 +530,6 @@ public class ImageSegmenter : MonoBehaviour
         {
             await File.WriteAllBytesAsync(filePath, pngBytes);
         }
-
-        Debug.Log(filePath);
-        Debug.Log(AssetImporter.GetAtPath(filePath));
 
         TextureImporter textureImporter = AssetImporter.GetAtPath(filePath) as TextureImporter;
 

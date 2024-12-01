@@ -3,84 +3,95 @@ using Saferio.Prototype.ColoringBook;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SelectColorButton : MonoBehaviour
+namespace Saferio.Prototype.ColoringBook
 {
-    [SerializeField] private RectTransform rectTransform;
-    [SerializeField] private Button selectButton;
-
-    [SerializeField] private Image buttonImage;
-    [SerializeField] private Image progress;
-
-    [SerializeField] private Color _colorGroup;
-    [SerializeField] private int _numberOfRegions;
-    private int _numberOfFilledRegions;
-
-    public static event Action<Color> selectColorGroupEvent;
-
-    public RectTransform RectTransform
+    public class SelectColorButton : MonoBehaviour
     {
-        get => rectTransform;
-        set => rectTransform = value;
-    }
+        [SerializeField] private RectTransform rectTransform;
+        [SerializeField] private Button selectButton;
 
-    public Image ButtonImage
-    {
-        get => buttonImage;
-        set => buttonImage = value;
-    }
+        [SerializeField] private Image buttonImage;
+        [SerializeField] private Image progress;
 
-    public Color ColorGroup
-    {
-        get => _colorGroup;
-        set => _colorGroup = value;
-    }
+        [SerializeField] private Color _colorGroup;
+        [SerializeField] private int _numberOfRegions;
+        private int _numberOfFilledRegions;
 
-    public int NumberOfRegions
-    {
-        get => _numberOfRegions;
-        set => _numberOfRegions = value;
-    }
+        public static event Action<Color> selectColorGroupEvent;
+        public static event Action<ColorGroupData> getColorGroupDataEvent;
 
-    private void Awake()
-    {
-        ImageSegmenter.addRegionColorButtonEvent += AddRegion;
-        SpriteRegion.fillSpriteRegionEvent += OnSpriteRegionFilled;
-        LevelDataManager.incrementNumberOfFilledSegmentOfColorGroupEvent += OnSpriteRegionFilled;
-
-        selectButton.onClick.AddListener(SelectColor);
-
-        progress.fillAmount = 0;
-    }
-
-    private void OnDestroy()
-    {
-        ImageSegmenter.addRegionColorButtonEvent -= AddRegion;
-        SpriteRegion.fillSpriteRegionEvent -= OnSpriteRegionFilled;
-        LevelDataManager.incrementNumberOfFilledSegmentOfColorGroupEvent -= OnSpriteRegionFilled;
-    }
-
-    private void SelectColor()
-    {
-        selectColorGroupEvent?.Invoke(_colorGroup);
-    }
-
-    private void AddRegion(Color color)
-    {
-        if (color == _colorGroup)
+        public RectTransform RectTransform
         {
-            _numberOfRegions++;
+            get => rectTransform;
+            set => rectTransform = value;
         }
-    }
 
-    private void OnSpriteRegionFilled(Color color)
-    {
-        if (color == _colorGroup)
+        public Image ButtonImage
         {
-            _numberOfFilledRegions++;
+            get => buttonImage;
+            set => buttonImage = value;
+        }
 
-            Debug.Log(_numberOfFilledRegions + "/" + _numberOfRegions);
+        public Color ColorGroup
+        {
+            get => _colorGroup;
+            set => _colorGroup = value;
+        }
 
-            progress.fillAmount = (float)_numberOfFilledRegions / _numberOfRegions;
+        public int NumberOfRegions
+        {
+            get => _numberOfRegions;
+            set => _numberOfRegions = value;
+        }
+
+        private void Awake()
+        {
+            ImageSegmenter.addRegionColorButtonEvent += AddRegion;
+            SpriteRegion.fillSpriteRegionEvent += OnSpriteRegionFilled;
+            LevelDataManager.incrementNumberOfFilledSegmentOfColorGroupEvent += OnSpriteRegionFilled;
+
+            selectButton.onClick.AddListener(SelectColor);
+
+            progress.fillAmount = 0;
+
+            getColorGroupDataEvent?.Invoke(new ColorGroupData()
+            {
+                ColorString = _colorGroup.ToString(),
+                NumberOfRegions = _numberOfRegions,
+                NumberOfFilledRegions = _numberOfFilledRegions
+            });
+        }
+
+        private void OnDestroy()
+        {
+            ImageSegmenter.addRegionColorButtonEvent -= AddRegion;
+            SpriteRegion.fillSpriteRegionEvent -= OnSpriteRegionFilled;
+            LevelDataManager.incrementNumberOfFilledSegmentOfColorGroupEvent -= OnSpriteRegionFilled;
+        }
+
+        private void SelectColor()
+        {
+            selectColorGroupEvent?.Invoke(_colorGroup);
+        }
+
+        private void AddRegion(Color color)
+        {
+            if (color == _colorGroup)
+            {
+                _numberOfRegions++;
+            }
+        }
+
+        private void OnSpriteRegionFilled(Color color)
+        {
+            if (color == _colorGroup)
+            {
+                _numberOfFilledRegions++;
+
+                Debug.Log(_numberOfFilledRegions + "/" + _numberOfRegions);
+
+                progress.fillAmount = (float)_numberOfFilledRegions / _numberOfRegions;
+            }
         }
     }
 }

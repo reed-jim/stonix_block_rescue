@@ -1,73 +1,76 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ColorButtonSpawner : MonoBehaviour
+namespace Saferio.Prototype.ColoringBook
 {
-    [SerializeField] private RectTransform canvas;
-    [SerializeField] private SelectColorButton colorButtonPrefab;
-    [SerializeField] private RectTransform container;
-
-    private List<SelectColorButton> _colorButtons;
-
-    private void Awake()
+    public class ColorButtonSpawner : MonoBehaviour
     {
-        ImageSegmenter.spawnColorButtonEvent += SpawnColorButton;
+        [SerializeField] private RectTransform canvas;
+        [SerializeField] private SelectColorButton colorButtonPrefab;
+        [SerializeField] private RectTransform container;
 
-        _colorButtons = new List<SelectColorButton>();
-    }
+        private List<SelectColorButton> _colorButtons;
 
-    private void OnDestroy()
-    {
-        ImageSegmenter.spawnColorButtonEvent -= SpawnColorButton;
-    }
-
-    public void SpawnColorButtons(SpriteRegion[] spriteRegions)
-    {
-        _colorButtons = new List<SelectColorButton>();
-        
-        for (int i = 0; i < spriteRegions.Length; i++)
+        private void Awake()
         {
-            bool isColorGroupExist = false;
+            ImageSegmenter.spawnColorButtonEvent += SpawnColorButton;
 
-            for (int j = 0; j < _colorButtons.Count; j++)
+            _colorButtons = new List<SelectColorButton>();
+        }
+
+        private void OnDestroy()
+        {
+            ImageSegmenter.spawnColorButtonEvent -= SpawnColorButton;
+        }
+
+        public void SpawnColorButtons(SpriteRegion[] spriteRegions)
+        {
+            _colorButtons = new List<SelectColorButton>();
+
+            for (int i = 0; i < spriteRegions.Length; i++)
             {
-                if (_colorButtons[j].ColorGroup == spriteRegions[i].ColorGroup)
+                bool isColorGroupExist = false;
+
+                for (int j = 0; j < _colorButtons.Count; j++)
                 {
-                    _colorButtons[j].NumberOfRegions++;
+                    if (_colorButtons[j].ColorGroup == spriteRegions[i].ColorGroup)
+                    {
+                        _colorButtons[j].NumberOfRegions++;
 
-                    isColorGroupExist = true;
+                        isColorGroupExist = true;
 
-                    break;
+                        break;
+                    }
+                }
+
+                if (!isColorGroupExist)
+                {
+                    SpawnColorButton(spriteRegions[i].ColorGroup);
                 }
             }
-
-            if (!isColorGroupExist)
-            {
-                SpawnColorButton(spriteRegions[i].ColorGroup);
-            }
         }
-    }
 
-    private void SpawnColorButton(Color color)
-    {
-        SelectColorButton selectColorButton = Instantiate(colorButtonPrefab, container);
-
-        selectColorButton.ButtonImage.color = color;
-        selectColorButton.ColorGroup = color;
-        selectColorButton.NumberOfRegions = 1;
-
-        _colorButtons.Add(selectColorButton);
-
-        GenerateUI();
-    }
-
-    private void GenerateUI()
-    {
-        Vector2 buttonSize = _colorButtons[0].RectTransform.sizeDelta;
-
-        for (int i = 0; i < _colorButtons.Count; i++)
+        private void SpawnColorButton(Color color)
         {
-            UIUtil.SetLocalPositionX(_colorButtons[i].RectTransform, -0.45f * canvas.sizeDelta.x + i * 1.2f * buttonSize.x);
+            SelectColorButton selectColorButton = Instantiate(colorButtonPrefab, container);
+
+            selectColorButton.ButtonImage.color = color;
+            selectColorButton.ColorGroup = color;
+            selectColorButton.NumberOfRegions = 1;
+
+            _colorButtons.Add(selectColorButton);
+
+            GenerateUI();
+        }
+
+        private void GenerateUI()
+        {
+            Vector2 buttonSize = _colorButtons[0].RectTransform.sizeDelta;
+
+            for (int i = 0; i < _colorButtons.Count; i++)
+            {
+                UIUtil.SetLocalPositionX(_colorButtons[i].RectTransform, -0.45f * canvas.sizeDelta.x + i * 1.2f * buttonSize.x);
+            }
         }
     }
 }
