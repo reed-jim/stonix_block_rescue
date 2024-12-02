@@ -27,6 +27,11 @@ public class PairGalleryItemUI : MonoBehaviour, ISaferioScrollViewItem
         GenerateUI(parent);
     }
 
+    public bool IsValidAtIndex(int index)
+    {
+        return (index * 2) >= 0 && (index * 2) < galleryItemDataContainer.Items.Length;
+    }
+
     public void Refresh(int index)
     {
         _pairGalleryItemData = new GalleryItemData[2];

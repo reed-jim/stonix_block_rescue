@@ -2298,7 +2298,7 @@ MonoBehaviour:
   viewArea: {fileID: 2855069}
   scrollRect: {fileID: 1390504174}
   content: {fileID: 407948856}
-  poolSize: 3
+  poolSize: 4
 --- !u!4 &1285077791
 Transform:
   m_ObjectHideFlags: 0
