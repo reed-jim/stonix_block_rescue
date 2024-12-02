@@ -44,12 +44,33 @@ namespace Saferio.Prototype.ColoringBook
         {
             SwitchRouteButton.switchRouteEvent += OnRouteSwitched;
 
+            RegisterMoreEvent();
+
             _transitionAnimation = GetComponent<ISaferioUIAnimation>();
+
+            MoreActionInAwake();
         }
 
         private void OnDestroy()
         {
             SwitchRouteButton.switchRouteEvent -= OnRouteSwitched;
+
+            UnregisterMoreEvent();
+        }
+
+        protected virtual void RegisterMoreEvent()
+        {
+
+        }
+
+        protected virtual void UnregisterMoreEvent()
+        {
+
+        }
+
+        protected virtual void MoreActionInAwake()
+        {
+
         }
 
         private void OnRouteSwitched(ScreenRoute route)
@@ -64,12 +85,12 @@ namespace Saferio.Prototype.ColoringBook
             }
         }
 
-        private void Show()
+        protected void Show()
         {
             _transitionAnimation.Show();
         }
 
-        private void Hide()
+        protected void Hide()
         {
             _transitionAnimation.Hide();
         }

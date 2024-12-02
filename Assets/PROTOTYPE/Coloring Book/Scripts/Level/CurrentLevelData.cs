@@ -6,7 +6,7 @@ namespace Saferio.Prototype.ColoringBook
     public class CurrentLevelData : ScriptableObject
     {
         [SerializeField] private int level;
-        private Sprite _sprite;
+        private string _spriteAdress;
 
         public int Level
         {
@@ -14,10 +14,10 @@ namespace Saferio.Prototype.ColoringBook
             set => level = value;
         }
 
-        public Sprite Sprite
+        public string SpriteAdress
         {
-            get => _sprite;
-            set => _sprite = value;
+            get => _spriteAdress;
+            set => _spriteAdress = value;
         }
     }
 }

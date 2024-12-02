@@ -12,7 +12,7 @@ namespace Saferio.Prototype.ColoringBook
         string _savePath;
         private Sprite _targetSprite;
         ImageSegmenter _imageSegmenter;
-        [SerializeField] private CurrentLevelData currentLevelData;
+        private CurrentLevelData _currentLevelData;
 
 
         [MenuItem("Tools/Saferio/Prototype/Coloring Book/Level Generator Tool")]
@@ -28,6 +28,8 @@ namespace Saferio.Prototype.ColoringBook
             _savePath = EditorGUILayout.TextField("Level Prefab Save Path", _savePath);
 
             _targetSprite = (Sprite)EditorGUILayout.ObjectField(_targetSprite, typeof(Sprite));
+
+            _currentLevelData = (CurrentLevelData)EditorGUILayout.ObjectField(_currentLevelData, typeof(CurrentLevelData));
 
             _imageSegmenter = (ImageSegmenter)EditorGUILayout.ObjectField(_imageSegmenter, typeof(ImageSegmenter));
 
@@ -51,7 +53,7 @@ namespace Saferio.Prototype.ColoringBook
         {
             GameObject level = AssetDatabase.LoadAssetAtPath<GameObject>(_savePath);
 
-            currentLevelData.Level = _savePath.Last();
+            _currentLevelData.Level = int.Parse(_savePath.Last().ToString());
 
             _imageSegmenter.ProcessImageAndSegment(_targetSprite);
 

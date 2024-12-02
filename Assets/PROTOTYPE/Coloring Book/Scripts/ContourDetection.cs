@@ -61,13 +61,13 @@ public class ImageSegmenter : MonoBehaviour
 
     void SpawnSegmentationSprite(CurrentLevelData currentLevelData)
     {
-        originalSpriteRenderer.sprite = currentLevelData.Sprite;
+        // originalSpriteRenderer.sprite = currentLevelData.Sprite;
 
-        texture = originalSpriteRenderer.sprite.texture;
+        // texture = originalSpriteRenderer.sprite.texture;
 
-        texture.GetPixels32();
+        // texture.GetPixels32();
 
-        ProcessImageAndSegment();
+        // ProcessImageAndSegment();
     }
 
     public void ProcessImageAndSegment(Sprite originalSprite)

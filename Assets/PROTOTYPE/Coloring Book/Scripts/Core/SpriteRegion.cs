@@ -85,16 +85,13 @@ public class SpriteRegion : MonoBehaviour
 
     private async void LoadSprite()
     {
-        if (currentLevelData.Sprite == null)
-        {
-            currentLevelData.Sprite = await LoadSpriteFromAddressableAsync("watermelon");
-        }
+        Sprite originalSprite = await LoadSpriteFromAddressableAsync(currentLevelData.SpriteAdress);
 
         _segmentIndex = transform.GetSiblingIndex();
 
-        _outlinedSprite = await LoadSpriteFromAddressableAsync($"Outline - {currentLevelData.Sprite.texture.name} {_segmentIndex}");
-        _sprite = await LoadSpriteFromAddressableAsync($"Filled - {currentLevelData.Sprite.texture.name} {_segmentIndex}");
-        _highlightSprite = await LoadSpriteFromAddressableAsync($"Highlight - {currentLevelData.Sprite.texture.name} {_segmentIndex}");
+        _outlinedSprite = await LoadSpriteFromAddressableAsync($"Outline - {originalSprite.texture.name} {_segmentIndex}");
+        _sprite = await LoadSpriteFromAddressableAsync($"Filled - {originalSprite.texture.name} {_segmentIndex}");
+        _highlightSprite = await LoadSpriteFromAddressableAsync($"Highlight - {originalSprite.texture.name} {_segmentIndex}");
 
         spriteRenderer.sprite = _outlinedSprite;
 

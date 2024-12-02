@@ -30,7 +30,7 @@ namespace Saferio.Prototype.ColoringBook
             _spriteRegions = new List<SpriteRegion>();
             _colorGroupsData = new List<ColorGroupData>();
 
-            SaferioTween.DelayAsync(6f, onCompletedAction: () =>
+            SaferioTween.DelayAsync(8f, onCompletedAction: () =>
             {
                 SaveSpriteSegmentsData(_spriteRegions, _colorGroupsData.ToArray());
             });
@@ -98,7 +98,7 @@ namespace Saferio.Prototype.ColoringBook
             }
 
             _levelData.SpriteSegmentsData[segmentIndex].IsFilled = true;
-            
+
             SaveLevelData();
         }
 

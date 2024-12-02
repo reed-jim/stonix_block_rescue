@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dfe6b501b148ef042aaa835abee09b7b, type: 3}
   m_Name: Gallery Item Data 4
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: 3a4c97ef2b8b04c4e8c2fb08f782c070, type: 3}
+  level: 5
+  spriteAdress: Original Texture Level 5
   outlinedSprite: {fileID: 21300000, guid: 656f29d6b45bb5a4d8c0db0b2fa05ae4, type: 3}
   galleryImageTag: 0

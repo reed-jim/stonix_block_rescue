@@ -60,7 +60,8 @@ namespace Saferio.Prototype.ColoringBook
 
         private void Play()
         {
-            currentLevelData.Sprite = _galleryItemData.Sprite;
+            currentLevelData.Level = _galleryItemData.Level;
+            currentLevelData.SpriteAdress = _galleryItemData.SpriteAdress;
 
             SceneManager.LoadSceneAsync("Coloring Book - Gameplay");
         }

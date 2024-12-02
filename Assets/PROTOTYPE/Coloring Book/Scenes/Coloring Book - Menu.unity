@@ -3377,6 +3377,8 @@ MonoBehaviour:
   prefabsWithIdentifier:
   - prefab: {fileID: 8945915159367500476, guid: 8e4df1b16fc54bc4f8256922c2aed89c, type: 3}
     identifier: fill_color_sound
+  - prefab: {fileID: 8945915159367500476, guid: 3cdf3737ddcb25a4198a56d7fce7482a, type: 3}
+    identifier: WinSound
 --- !u!4 &2055448375
 Transform:
   m_ObjectHideFlags: 0

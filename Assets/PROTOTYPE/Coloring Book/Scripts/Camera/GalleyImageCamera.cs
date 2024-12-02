@@ -1,3 +1,5 @@
+using PrimeTween;
+using Saferio.Util.SaferioTween;
 using UnityEngine;
 
 namespace Saferio.Prototype.ColoringBook
@@ -12,10 +14,15 @@ namespace Saferio.Prototype.ColoringBook
 
         [SerializeField] private CurrentLevelData currentLevelData;
 
+        #region PRIVATE FIELD
+        private Sprite _originalSprite;
+        #endregion
+
         private void Awake()
         {
             SwipeGesture.swipeGestureEvent += MoveCamera;
             PinchGesture.pinchGestureEvent += ZoomCamera;
+            LevelController.winLevelEvent += OnWinLevel;
 
             FitTheGalleryImage();
         }
@@ -24,11 +31,14 @@ namespace Saferio.Prototype.ColoringBook
         {
             SwipeGesture.swipeGestureEvent -= MoveCamera;
             PinchGesture.pinchGestureEvent -= ZoomCamera;
+            LevelController.winLevelEvent -= OnWinLevel;
         }
 
-        private void FitTheGalleryImage()
+        private async void FitTheGalleryImage()
         {
-            imageCamera.orthographicSize = 1.2f * currentLevelData.Sprite.bounds.size.x;
+            _originalSprite = await AssetUtil.LoadSpriteFromAddressableAsync(currentLevelData.SpriteAdress);
+
+            imageCamera.orthographicSize = 1.2f * _originalSprite.bounds.size.x;
         }
 
         private void MoveCamera(Vector2 moveDirection)
@@ -39,6 +49,12 @@ namespace Saferio.Prototype.ColoringBook
         private void ZoomCamera(float zoomValue)
         {
             imageCamera.orthographicSize = zoomValue;
+        }
+
+        private void OnWinLevel()
+        {
+            SaferioTween.PositionAsync(imageCameraTransform, new Vector3(0, 0, imageCameraTransform.position.z), duration: 0.5f);
+            Tween.CameraOrthographicSize(imageCamera, 1.1f * _originalSprite.bounds.size.x, duration: 0.5f);
         }
     }
 }
