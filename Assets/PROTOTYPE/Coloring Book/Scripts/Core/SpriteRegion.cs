@@ -30,6 +30,7 @@ public class SpriteRegion : MonoBehaviour
     public static event Action<Color> fillSpriteRegionEvent;
     public static event Action<int> fillSpriteSegmentEvent;
     public static event Action<SpriteRegion> getSpriteRegionEvent;
+    public static event Action playSoundFillColorEvent;
     #endregion
 
     public int SegmentIndex
@@ -120,22 +121,6 @@ public class SpriteRegion : MonoBehaviour
         {
             return null;
         }
-
-        // handle.Completed += (op) =>
-        // {
-        //     if (op.Status == AsyncOperationStatus.Succeeded)
-        //     {
-        //         Texture2D texture = op.Result;
-
-        //         _outlinedSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.zero);
-
-        //         spriteRenderer.sprite = _outlinedSprite;
-        //     }
-        //     else
-        //     {
-
-        //     }
-        // };
     }
 
     public void Setup(Sprite outlinedSprite, Sprite filledSprite, Sprite highlightSprite)
@@ -163,6 +148,8 @@ public class SpriteRegion : MonoBehaviour
         spriteRenderer.color = ColorUtil.WithAlpha(spriteRenderer.color, 0);
 
         Tween.Alpha(spriteRenderer, 1, duration: 0.3f);
+
+        playSoundFillColorEvent?.Invoke();
 
         fillSpriteRegionEvent?.Invoke(_colorGroup);
         fillSpriteSegmentEvent?.Invoke(_segmentIndex);

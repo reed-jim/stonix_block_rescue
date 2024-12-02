@@ -32,6 +32,31 @@ public static class DataUtility
         File.WriteAllText(filePath, json.ToString());
     }
 
+    public async static void SaveAsync<T>(string fileName, string key, T data)
+    {
+        string filePath = Application.persistentDataPath + $"/{fileName}.json";
+
+        string fileText = "{}";
+
+        if (File.Exists(filePath))
+        {
+            fileText = await File.ReadAllTextAsync(filePath);
+        }
+
+        JObject json = JObject.Parse(fileText);
+
+        if (json.ContainsKey(key))
+        {
+            json[key] = JsonConvert.SerializeObject(data);
+        }
+        else
+        {
+            json.Add(key, JsonConvert.SerializeObject(data));
+        }
+
+        await File.WriteAllTextAsync(filePath, json.ToString());
+    }
+
     public static T Load<T>(string fileName, string key, T defaultValue)
     {
         string filePath = Application.persistentDataPath + $"/{fileName}.json";

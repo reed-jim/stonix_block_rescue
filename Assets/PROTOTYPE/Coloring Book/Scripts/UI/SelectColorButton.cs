@@ -88,7 +88,7 @@ namespace Saferio.Prototype.ColoringBook
             {
                 _numberOfFilledRegions++;
 
-                Debug.Log(_numberOfFilledRegions + "/" + _numberOfRegions);
+                // Debug.Log(_numberOfFilledRegions + "/" + _numberOfRegions);
 
                 progress.fillAmount = (float)_numberOfFilledRegions / _numberOfRegions;
             }
