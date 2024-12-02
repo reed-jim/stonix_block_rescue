@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.IO;
+using System.Linq;
 using Saferio.Prototype.ColoringBook;
 using UnityEditor;
 using UnityEngine;
@@ -8,10 +9,10 @@ namespace Saferio.Prototype.ColoringBook
 {
     public class LevelGeneratorTool : EditorWindow
     {
-        string _savePath = "Assets/SavedImages";
+        string _savePath;
         private Sprite _targetSprite;
-
         ImageSegmenter _imageSegmenter;
+        [SerializeField] private CurrentLevelData currentLevelData;
 
 
         [MenuItem("Tools/Saferio/Prototype/Coloring Book/Level Generator Tool")]
@@ -24,7 +25,7 @@ namespace Saferio.Prototype.ColoringBook
 
         private void OnGUI()
         {
-            _savePath = EditorGUILayout.TextField("Save Path", _savePath);
+            _savePath = EditorGUILayout.TextField("Level Prefab Save Path", _savePath);
 
             _targetSprite = (Sprite)EditorGUILayout.ObjectField(_targetSprite, typeof(Sprite));
 
@@ -49,6 +50,8 @@ namespace Saferio.Prototype.ColoringBook
         private void GenerateLevel()
         {
             GameObject level = AssetDatabase.LoadAssetAtPath<GameObject>(_savePath);
+
+            currentLevelData.Level = _savePath.Last();
 
             _imageSegmenter.ProcessImageAndSegment(_targetSprite);
 

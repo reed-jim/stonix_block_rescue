@@ -37,10 +37,18 @@ namespace Saferio.Prototype.ColoringBook
 
         public void SetupUI(RectTransform parent, int indexInParent)
         {
-            UIUtil.SetSize(container, 0.45f * parent.sizeDelta.x, parent.sizeDelta.y);
-            UIUtil.SetSizeKeepRatioX(imageRT, 1.2f * container.sizeDelta.y);
+            UIUtil.SetSize(container, parent.sizeDelta.y, parent.sizeDelta.y);
 
-            float distanceBetweenItem = 0.05f * container.sizeDelta.x;
+            if (image.sprite.bounds.size.x < image.sprite.bounds.size.y)
+            {
+                UIUtil.SetSizeKeepRatioY(imageRT, container.sizeDelta.x);
+            }
+            else
+            {
+                UIUtil.SetSizeKeepRatioX(imageRT, container.sizeDelta.y);
+            }
+
+            float distanceBetweenItem = 0.1f * container.sizeDelta.x;
 
             UIUtil.SetLocalPositionX(container, (-(2 - 1) / 2f + indexInParent) * (container.sizeDelta.x + distanceBetweenItem));
         }

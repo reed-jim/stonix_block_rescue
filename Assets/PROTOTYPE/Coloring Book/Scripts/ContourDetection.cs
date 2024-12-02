@@ -24,6 +24,9 @@ public class ImageSegmenter : MonoBehaviour
     public GameObject spritePrefab;
     [SerializeField] private ColorButtonSpawner colorButtonSpawner;
 
+    [Header("SCRIPTABLE OBJECT")]
+    [SerializeField] private CurrentLevelData currentLevelData;
+
     [Header("CUSTOMIZE")]
     [SerializeField] private double thresh;
     [SerializeField] private double threshLinking;
@@ -201,9 +204,9 @@ public class ImageSegmenter : MonoBehaviour
             segmentHighlightSprite.name = $"Highlight - {texture.name} {segmentIndex}";
 
 #if UNITY_EDITOR
-            SaveSpriteToFile(segmentOutlineSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Outlined", segmentOutlinedTexture.name);
-            SaveSpriteToFile(segmentSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Filled", segmentSprite.name);
-            SaveSpriteToFile(segmentHighlightSprite, "Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level 1/Highlight", segmentHighlightSprite.name);
+            SaveSpriteToFile(segmentOutlineSprite, $"Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level {currentLevelData.Level}/Outlined", segmentOutlinedTexture.name);
+            SaveSpriteToFile(segmentSprite, $"Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level {currentLevelData.Level}/Filled", segmentSprite.name);
+            SaveSpriteToFile(segmentHighlightSprite, $"Assets/PROTOTYPE/Coloring Book/Sprites/Gallery/Level {currentLevelData.Level}/Highlight", segmentHighlightSprite.name);
 #endif
 
             segmentIndex++;
