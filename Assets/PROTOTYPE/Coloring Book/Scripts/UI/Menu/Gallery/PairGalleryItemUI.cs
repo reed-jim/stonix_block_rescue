@@ -47,7 +47,7 @@ public class PairGalleryItemUI : MonoBehaviour, ISaferioScrollViewItem
 
     private void GenerateUI(RectTransform parent)
     {
-        UIUtil.SetSize(container, parent.sizeDelta.x, 0.2f * parent.sizeDelta.y);
+        UIUtil.SetSize(container, parent.sizeDelta.x, 0.26f * parent.sizeDelta.y);
 
         for (int i = 0; i < _pairGalleryItem.Length; i++)
         {

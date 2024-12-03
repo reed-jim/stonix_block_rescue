@@ -11,7 +11,7 @@ public class GalleryScrollViewModifier : MonoBehaviour, ISaferioLayoutModifier
     {
         _canvasSize = canvas.sizeDelta;
 
-        UIUtil.SetSize(viewArea, 0.9f * _canvasSize.x, 0.7f * _canvasSize.y);
+        UIUtil.SetSize(viewArea, 0.9f * _canvasSize.x, 0.75f * _canvasSize.y);
 
         UIUtil.SetLocalPositionOfRectToAnotherRectVertically(viewArea, canvas, 0.5f, -0.5f);
     }
