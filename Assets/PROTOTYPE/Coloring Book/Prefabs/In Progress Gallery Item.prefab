@@ -220,13 +220,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9061103596087479591}
-  - component: {fileID: 2051278908617608557}
+  - component: {fileID: 364218332149530179}
   - component: {fileID: 5101319872559451364}
   - component: {fileID: 7547894793173208151}
   - component: {fileID: 8644182567241946888}
   - component: {fileID: 7686861208726462524}
   m_Layer: 5
-  m_Name: Gallery Item
+  m_Name: In Progress Gallery Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -253,7 +253,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 900, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2051278908617608557
+--- !u!114 &364218332149530179
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -262,7 +262,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6245844252706042803}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07a6da6f9c571274395d74d981f33a80, type: 3}
+  m_Script: {fileID: 11500000, guid: 17daa6519021bbd48a696441f423ab7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   container: {fileID: 9061103596087479591}

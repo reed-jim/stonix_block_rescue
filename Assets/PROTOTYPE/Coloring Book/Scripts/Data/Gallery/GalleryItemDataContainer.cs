@@ -11,5 +11,10 @@ namespace Saferio.Prototype.ColoringBook
         {
             get => items;
         }
+
+        public void SetGalleryItemInProgress(int index, bool isInProgress)
+        {
+            items[index].IsInProgress = isInProgress;
+        }
     }
 }

@@ -13,7 +13,9 @@ namespace Saferio.Prototype.ColoringBook
         [SerializeField] private Image image;
         [SerializeField] private Button playButton;
 
+        [Header("SCRIPTABLE OBJECT")]
         [SerializeField] private CurrentLevelData currentLevelData;
+        [SerializeField] protected GalleryItemDataContainer galleryItemDataContainer;
 
         private GalleryItemData _galleryItemData;
 
@@ -35,7 +37,7 @@ namespace Saferio.Prototype.ColoringBook
             _galleryItemData = galleryItemData;
         }
 
-        public void SetupUI(RectTransform parent, int indexInParent)
+        public virtual void SetupUI(RectTransform parent, int galleryItemIndex)
         {
             UIUtil.SetSize(container, parent.sizeDelta.y, parent.sizeDelta.y);
 
@@ -50,7 +52,7 @@ namespace Saferio.Prototype.ColoringBook
 
             float distanceBetweenItem = 0.1f * container.sizeDelta.x;
 
-            UIUtil.SetLocalPositionX(container, (-(2 - 1) / 2f + indexInParent) * (container.sizeDelta.x + distanceBetweenItem));
+            UIUtil.SetLocalPositionX(container, (-(2 - 1) / 2f + (galleryItemIndex % 2)) * (container.sizeDelta.x + distanceBetweenItem));
         }
 
         private void GenerateUI()
@@ -62,6 +64,8 @@ namespace Saferio.Prototype.ColoringBook
         {
             currentLevelData.Level = _galleryItemData.Level;
             currentLevelData.SpriteAdress = _galleryItemData.SpriteAdress;
+
+            galleryItemDataContainer.SetGalleryItemInProgress(currentLevelData.Level - 1, true);
 
             SceneManager.LoadSceneAsync("Coloring Book - Gameplay");
         }

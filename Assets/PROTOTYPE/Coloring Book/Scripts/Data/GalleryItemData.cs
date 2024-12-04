@@ -9,6 +9,7 @@ namespace Saferio.Prototype.ColoringBook
         [SerializeField] private string spriteAdress;
         [SerializeField] private Sprite outlinedSprite;
         [SerializeField] private GameEnum.GalleryImageTag galleryImageTag;
+        [SerializeField] private bool isInProgress;
 
         public int Level
         {
@@ -23,6 +24,12 @@ namespace Saferio.Prototype.ColoringBook
         public Sprite OutlinedSprite
         {
             get => outlinedSprite;
+        }
+
+        public bool IsInProgress
+        {
+            get => isInProgress;
+            set => isInProgress = value;
         }
     }
 }

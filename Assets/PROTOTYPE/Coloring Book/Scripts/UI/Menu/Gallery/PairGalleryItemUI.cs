@@ -11,6 +11,7 @@ public class PairGalleryItemUI : MonoBehaviour, ISaferioScrollViewItem
     [SerializeField] private GalleryItemUI[] _pairGalleryItem;
 
     private GalleryItemData[] _pairGalleryItemData;
+    private int _pairIndex;
 
     public void Setup(int index, RectTransform parent)
     {
@@ -23,6 +24,8 @@ public class PairGalleryItemUI : MonoBehaviour, ISaferioScrollViewItem
         {
             _pairGalleryItem[i].Setup(_pairGalleryItemData[i]);
         }
+
+        _pairIndex = index;
 
         GenerateUI(parent);
     }
@@ -51,9 +54,9 @@ public class PairGalleryItemUI : MonoBehaviour, ISaferioScrollViewItem
 
         for (int i = 0; i < _pairGalleryItem.Length; i++)
         {
-            int indexInParent = i;
+            int galleryItemIndex = _pairIndex * 2 + i;
 
-            _pairGalleryItem[i].SetupUI(container, indexInParent);
+            _pairGalleryItem[i].SetupUI(container, galleryItemIndex);
         }
     }
 }
