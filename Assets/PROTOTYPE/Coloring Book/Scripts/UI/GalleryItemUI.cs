@@ -1,4 +1,3 @@
-using System.Drawing;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -55,11 +54,6 @@ namespace Saferio.Prototype.ColoringBook
             UIUtil.SetLocalPositionX(container, (-(2 - 1) / 2f + (galleryItemIndex % 2)) * (container.sizeDelta.x + distanceBetweenItem));
         }
 
-        private void GenerateUI()
-        {
-
-        }
-
         private void Play()
         {
             currentLevelData.Level = _galleryItemData.Level;
@@ -67,7 +61,7 @@ namespace Saferio.Prototype.ColoringBook
 
             galleryItemDataContainer.SetGalleryItemInProgress(currentLevelData.Level - 1, true);
 
-            SceneManager.LoadSceneAsync("Coloring Book - Gameplay");
+            SceneManager.LoadSceneAsync(GameConstant.GAMEPLAY_SCENE);
         }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Saferio.Util.SaferioTween;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class SwipeGesture : MonoBehaviour
 {
@@ -31,6 +32,11 @@ public class SwipeGesture : MonoBehaviour
     {
         if (Input.GetMouseButton(0) && Input.touchCount == 1 && !_isDisabled)
         {
+            if (IsClickOnUI())
+            {
+                return;
+            }
+
             Vector2 mousePosition = Input.mousePosition;
 
             if (!_isLastPositionExist)
@@ -62,5 +68,26 @@ public class SwipeGesture : MonoBehaviour
         {
             _isDisabled = false;
         });
+    }
+
+    private bool IsClickOnUI()
+    {
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current)
+        {
+            position = Input.mousePosition
+        };
+
+        var raycastResults = new List<RaycastResult>();
+
+        EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+
+        if (raycastResults.Count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

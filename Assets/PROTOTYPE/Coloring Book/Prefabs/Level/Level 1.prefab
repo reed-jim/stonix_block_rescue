@@ -9426,6 +9426,7 @@ MonoBehaviour:
   originalSpriteRenderer: {fileID: 6930315809562173429}
   spritePrefab: {fileID: 9147805768947195604, guid: 57600513726ad5a46b0128467106d87a, type: 3}
   colorButtonSpawner: {fileID: 7672549648356343225}
+  currentLevelData: {fileID: 0}
   thresh: 50
   threshLinking: 100
   blurRadius: 3
